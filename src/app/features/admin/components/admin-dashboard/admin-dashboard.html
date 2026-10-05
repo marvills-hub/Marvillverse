@@ -1,0 +1,23 @@
+﻿<section>
+<div class="welcome"><div><span>ECOSYSTEM STATUS</span><h2>MARVILLVERSE IS<br><b>OPERATIONAL.</b></h2><p>Manage the systems, development state and activity powering your software universe.</p></div><div class="orb"><i></i><b>M</b></div></div>
+<div class="stats">
+<div><span>TOTAL SYSTEMS</span><strong>{{projects().length}}</strong><small>REGISTERED PROJECTS</small></div>
+<div><span>BUILDING</span><strong>{{building()}}</strong><small>IN DEVELOPMENT</small></div>
+<div><span>ACTIVE</span><strong>{{active()}}</strong><small>OPERATIONAL</small></div>
+<div><span>AVG. PROGRESS</span><strong>{{avg()}}<i>%</i></strong><small>ECOSYSTEM COMPLETION</small></div>
+</div>
+<div class="grid">
+<div class="systems">
+<div class="title"><span>PROJECT SYSTEMS</span><button (click)="navigate.emit('projects')">MANAGE ALL →</button></div>
+@for(p of projects().slice(0,5);track p.id){
+<div class="project"><i [style.--accent]="p.accent">{{p.monogram}}</i><span><b>{{p.name}}</b><small>{{p.tagline}}</small></span><div><em>{{p.progress}}%</em><span><i [style.width.%]="p.progress" [style.--accent]="p.accent"></i></span></div><strong>{{p.status}}</strong></div>
+}
+</div>
+<div class="activity">
+<div class="title"><span>RECENT ACTIVITY</span><button (click)="navigate.emit('activity')">VIEW LOG →</button></div>
+@for(a of activities().slice(0,5);track a.date+a.projectId){
+<div class="event"><i></i><div><span>{{a.type}} · {{a.date}}</span><b>{{a.title}}</b><small>{{a.description}}</small></div></div>
+}
+</div>
+</div>
+</section>

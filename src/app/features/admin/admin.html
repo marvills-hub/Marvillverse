@@ -1,0 +1,45 @@
+﻿@if(checking()){
+<div class="boot"><div class="loader"></div><span>INITIALIZING MARVILLVERSE CONTROL...</span></div>
+}@else if(!auth.authorized()){
+<div class="login">
+<div class="login-grid"></div>
+<div class="login-glow"></div>
+<div class="login-box">
+<div class="mark">M</div>
+<span class="eyebrow">MARVILLVERSE // RESTRICTED SYSTEM</span>
+<h1>CONTROL<br><b>CENTER.</b></h1>
+<p>Administrative access is required to modify the MarvillVerse registry.</p>
+<label>ADMIN ACCESS TOKEN</label>
+<input type="password" placeholder="Enter secure token" [ngModel]="loginToken()" (ngModelChange)="loginToken.set($event)" (keydown.enter)="login()">
+@if(error()){<div class="error">ACCESS DENIED · INVALID TOKEN</div>}
+<button (click)="login()">AUTHENTICATE <span>→</span></button>
+<a href="/">← RETURN TO MARVILLVERSE</a>
+</div>
+</div>
+}@else{
+<div class="admin">
+<aside>
+<a class="brand" href="/"><i>M</i><span>MARVILL<b>VERSE</b><small>CONTROL CENTER</small></span></a>
+<nav>
+<span>COMMAND</span>
+<button [class.active]="section()==='dashboard'" (click)="section.set('dashboard')"><i>◈</i><b>Overview</b></button>
+<button [class.active]="section()==='projects'" (click)="section.set('projects')"><i>◇</i><b>Projects</b><em>{{projects.projects().length}}</em></button>
+<button [class.active]="section()==='activity'" (click)="section.set('activity')"><i>⌁</i><b>Activity</b><em>{{projects.activities().length}}</em></button>
+</nav>
+<div class="aside-bottom">
+<div class="connection"><i></i><span>CLOUDFLARE D1<small>REGISTRY ONLINE</small></span></div>
+<a href="/" target="_blank">OPEN PUBLIC SITE ↗</a>
+<button (click)="logout()">DISCONNECT</button>
+</div>
+</aside>
+<main>
+<header>
+<div><span>MARVILLVERSE / ADMIN</span><h1>{{title()}}</h1></div>
+<div class="head-status"><i></i>ADMIN SESSION ACTIVE</div>
+</header>
+@if(section()==='dashboard'){<app-admin-dashboard (navigate)="section.set($event)"/>}
+@if(section()==='projects'){<app-admin-projects/>}
+@if(section()==='activity'){<app-admin-activity/>}
+</main>
+</div>
+}

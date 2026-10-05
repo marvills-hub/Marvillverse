@@ -1,0 +1,18 @@
+﻿@if(open()){
+<div class="overlay" (click)="close()">
+<div class="palette" (click)="$event.stopPropagation()">
+<div class="search"><span>⌕</span><input autofocus placeholder="Search projects, technology, category..." [value]="query()" (input)="query.set($any($event.target).value)"><kbd>ESC</kbd></div>
+<div class="label">PROJECT SYSTEMS <b>{{results().length}}</b></div>
+<div class="results">
+@for(project of results();track project.id){
+<button (click)="select(project)" [style.--accent]="project.accent">
+<i>{{project.monogram}}</i>
+<span><b>{{project.name}}</b><small>{{project.tagline}}</small></span>
+<em>{{project.category}}</em><strong>↗</strong>
+</button>
+}@empty{<div class="empty">NO SYSTEMS FOUND</div>}
+</div>
+<div class="foot"><span>↑↓ NAVIGATE</span><span>ENTER OPEN</span><span>MARVILLVERSE COMMAND</span></div>
+</div>
+</div>
+}

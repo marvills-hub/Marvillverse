@@ -1,0 +1,12 @@
+﻿<header [class.scrolled]="scrolled()">
+<a class="brand" href="#top" (click)="close()"><span class="brand-mark">M</span><span>MARVILL<span>VERSE</span></span></a>
+<nav [class.open]="menuOpen()">
+<a href="#projects" (click)="close()">Projects</a>
+<a href="#activity" (click)="close()">Activity</a>
+<a href="#universe" (click)="close()">Universe</a>
+<a href="#about" (click)="close()">About</a>
+<a class="explore" href="#projects" (click)="close()">Explore <span>↗</span></a>
+</nav>
+<div class="shortcut">CTRL <b>+</b> K</div>
+<button class="menu" (click)="toggle()" aria-label="Menu"><i></i><i></i></button>
+</header>

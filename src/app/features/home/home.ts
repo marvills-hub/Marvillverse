@@ -1,0 +1,19 @@
+﻿import{Component}from'@angular/core';
+import{Header}from'../../layout/header/header';
+import{Footer}from'../../layout/footer/footer';
+import{Cursor}from'../../shared/components/cursor/cursor';
+import{ScrollProgress}from'../../shared/components/scroll-progress/scroll-progress';
+import{Hero}from'./components/hero/hero';
+import{Projects}from'./components/projects/projects';
+import{Marquee}from'./components/marquee/marquee';
+import{Telemetry}from'./components/telemetry/telemetry';
+import{ActivityStream}from'./components/activity-stream/activity-stream';
+import{Ecosystem}from'./components/ecosystem/ecosystem';
+import{About}from'./components/about/about';
+@Component({
+selector:'app-home',
+imports:[Header,Footer,Cursor,ScrollProgress,Hero,Projects,Marquee,Telemetry,ActivityStream,Ecosystem,About],
+templateUrl:'./home.html',
+styleUrl:'./home.scss'
+})
+export class Home{}

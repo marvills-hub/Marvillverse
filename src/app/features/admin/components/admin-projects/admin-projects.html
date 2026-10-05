@@ -1,0 +1,159 @@
+﻿<section class="registry">
+<div class="registry-head">
+<div>
+<span class="kicker">PROJECT REGISTRY</span>
+<h2>MANAGE THE UNIVERSE.</h2>
+<p>Search, inspect and maintain every software system registered in MarvillVerse.</p>
+</div>
+<button class="new" (click)="create()"><b>+</b> NEW PROJECT</button>
+</div>
+
+<div class="summary">
+<div><span>TOTAL</span><b>{{service.projects().length}}</b><small>REGISTERED</small></div>
+<div><span>BUILDING</span><b>{{building()}}</b><small>IN DEVELOPMENT</small></div>
+<div><span>ACTIVE</span><b>{{active()}}</b><small>OPERATIONAL</small></div>
+<div><span>FEATURED</span><b>{{featured()}}</b><small>HIGHLIGHTED</small></div>
+<div><span>AVERAGE</span><b>{{average()}}<i>%</i></b><small>PROGRESS</small></div>
+</div>
+
+<div class="controls">
+<div class="search">
+<span>⌕</span>
+<input
+type="search"
+placeholder="Search projects, technology, platforms..."
+[ngModel]="search()"
+(ngModelChange)="search.set($event)">
+@if(search()){
+<button (click)="search.set('')">×</button>
+}
+</div>
+
+<select [ngModel]="status()" (ngModelChange)="status.set($event)">
+@for(item of statuses;track item){
+<option [value]="item">{{item==='All'?'All statuses':item}}</option>
+}
+</select>
+
+<select [ngModel]="category()" (ngModelChange)="category.set($event)">
+@for(item of categories;track item){
+<option [value]="item">{{item==='All'?'All categories':item}}</option>
+}
+</select>
+
+<select [ngModel]="sort()" (ngModelChange)="sort.set($event)">
+<option value="order">Registry order</option>
+<option value="name">Name A–Z</option>
+<option value="progress-desc">Progress high–low</option>
+<option value="progress-asc">Progress low–high</option>
+<option value="updated">Recently updated</option>
+</select>
+
+<button class="reset" (click)="reset()">RESET</button>
+</div>
+
+<div class="result-head">
+<span><b>{{filtered().length}}</b> OF {{service.projects().length}} SYSTEMS</span>
+<span>D1 CLOUD REGISTRY</span>
+</div>
+
+<div class="cards">
+@for(p of filtered();track p.id){
+<article class="project-card" [style.--accent]="p.accent">
+<div class="accent"></div>
+
+<div class="card-head">
+<div class="identity">
+<i>{{p.monogram}}</i>
+<div>
+<div class="name-line">
+<h3>{{p.name}}</h3>
+@if(p.featured){<span class="featured">★ FEATURED</span>}
+</div>
+<p>{{p.tagline}}</p>
+</div>
+</div>
+
+<div class="state" [attr.data-status]="p.status">
+<i></i>{{p.status}}
+</div>
+</div>
+
+<p class="description">{{p.description}}</p>
+
+<div class="meta">
+<div>
+<span>CATEGORY</span>
+<b>{{p.category}}</b>
+</div>
+<div>
+<span>VERSION</span>
+<b>v{{p.version}}</b>
+</div>
+<div>
+<span>UPDATED</span>
+<b>{{p.updated}}</b>
+</div>
+</div>
+
+<div class="development">
+<div class="development-head">
+<span>DEVELOPMENT</span>
+<b>{{p.progress}}%</b>
+</div>
+<div class="track"><i [style.width.%]="p.progress"></i></div>
+</div>
+
+<div class="chips">
+@for(t of p.tech.slice(0,4);track t){<span>{{t}}</span>}
+@if(p.tech.length>4){<span>+{{p.tech.length-4}}</span>}
+</div>
+
+<div class="platforms">
+@for(platform of p.platforms;track platform){
+<span>{{platform}}</span>
+}
+</div>
+
+<div class="card-footer">
+<div class="links">
+@if(p.website){
+<button title="Open website" (click)="open(p.website)">WEBSITE ↗</button>
+}
+@if(p.github){
+<button title="Open repository" (click)="open(p.github)">GITHUB ↗</button>
+}
+@if(!p.website&&!p.github){
+<span>NO EXTERNAL LINKS</span>
+}
+</div>
+
+<div class="actions">
+<button (click)="duplicate(p)">DUPLICATE</button>
+<button class="edit" (click)="edit(p)">EDIT</button>
+<button
+class="delete"
+[disabled]="busy()===p.id"
+(click)="remove(p)">
+{{busy()===p.id?'...':'DELETE'}}
+</button>
+</div>
+</div>
+</article>
+}@empty{
+<div class="empty">
+<div>⌕</div>
+<h3>NO SYSTEMS FOUND</h3>
+<p>No projects match the current search and filters.</p>
+<button (click)="reset()">CLEAR FILTERS</button>
+</div>
+}
+</div>
+</section>
+
+@if(editor()){
+<app-admin-project-editor
+[project]="selected()"
+(cancel)="editor.set(false)"
+(saved)="saved()"/>
+}

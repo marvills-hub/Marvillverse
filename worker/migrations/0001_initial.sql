@@ -1,0 +1,39 @@
+﻿CREATE TABLE IF NOT EXISTS projects(
+id TEXT PRIMARY KEY,
+name TEXT NOT NULL,
+tagline TEXT NOT NULL,
+description TEXT NOT NULL,
+category TEXT NOT NULL,
+status TEXT NOT NULL,
+platforms TEXT NOT NULL DEFAULT '[]',
+tech TEXT NOT NULL DEFAULT '[]',
+monogram TEXT NOT NULL,
+accent TEXT NOT NULL,
+progress INTEGER NOT NULL DEFAULT 0,
+version TEXT NOT NULL DEFAULT '0.1.0',
+updated TEXT NOT NULL,
+started TEXT NOT NULL,
+featured INTEGER NOT NULL DEFAULT 0,
+vision TEXT NOT NULL DEFAULT '',
+capabilities TEXT NOT NULL DEFAULT '[]',
+github TEXT,
+website TEXT,
+sort_order INTEGER NOT NULL DEFAULT 0,
+created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS activities(
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+project_id TEXT NOT NULL,
+date TEXT NOT NULL,
+title TEXT NOT NULL,
+description TEXT NOT NULL,
+type TEXT NOT NULL,
+created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_projects_sort ON projects(sort_order);
+CREATE INDEX IF NOT EXISTS idx_activities_date ON activities(date DESC);
+CREATE INDEX IF NOT EXISTS idx_activities_project ON activities(project_id);

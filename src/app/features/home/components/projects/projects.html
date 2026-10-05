@@ -1,0 +1,10 @@
+﻿<section id="projects">
+<div class="section-head" reveal><div><span class="index">01 / PROJECTS</span><h2>THE UNIVERSE<br>IN MOTION.</h2></div><p>Independent ideas. Connected by one vision. Every system in MarvillVerse exists to solve, create or explore something new.</p></div>
+<div class="tools" reveal>
+<div class="search"><span>⌕</span><input placeholder="Search the universe..." [value]="query()" (input)="query.set($any($event.target).value)"></div>
+<select [value]="sort()" (change)="sort.set($any($event.target).value)"><option value="featured">Featured first</option><option value="updated">Recently updated</option><option value="progress">Development progress</option><option value="name">Alphabetical</option></select>
+</div>
+<div class="filters" reveal>@for(category of categories;track category){<button [class.active]="selected()===category" (click)="select(category)">{{category}}@if(category==='All'){<span>{{projectCount()}}</span>}</button>}</div>
+<div class="grid">@for(project of projects();track project.id;let i=$index){<app-project-card reveal [style.--delay]="i*70+'ms'" [project]="project" [index]="i" (open)="open($event)"/>}@empty{<div class="empty">NO SYSTEMS MATCH YOUR SEARCH.</div>}</div>
+</section>
+@if(activeProject();as project){<app-project-inspector [project]="project" (close)="close()"/>}

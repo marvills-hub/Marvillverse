@@ -1,0 +1,178 @@
+﻿<section class="activity-center">
+<div class="page-head">
+<div>
+<span>DEVELOPMENT HISTORY</span>
+<h2>ACTIVITY & RELEASES.</h2>
+<p>Track releases, milestones, launches and meaningful development events across MarvillVerse.</p>
+</div>
+<button class="create" (click)="open()"><b>+</b> LOG ACTIVITY</button>
+</div>
+
+<div class="summary">
+<div><span>TOTAL EVENTS</span><b>{{items().length}}</b><small>REGISTRY ENTRIES</small></div>
+<div><span>RELEASES</span><b>{{releases()}}</b><small>VERSION EVENTS</small></div>
+<div><span>MILESTONES</span><b>{{milestones()}}</b><small>MAJOR PROGRESS</small></div>
+<div><span>SYSTEMS</span><b>{{projects.projects().length}}</b><small>CONNECTED PROJECTS</small></div>
+</div>
+
+<div class="controls">
+<div class="search">
+<span>⌕</span>
+<input
+type="search"
+placeholder="Search development history..."
+[ngModel]="search()"
+(ngModelChange)="search.set($event)">
+@if(search()){<button (click)="search.set('')">×</button>}
+</div>
+
+<select [ngModel]="project()" (ngModelChange)="project.set($event)">
+<option value="All">All projects</option>
+@for(p of projects.projects();track p.id){
+<option [value]="p.id">{{p.name}}</option>
+}
+</select>
+
+<select [ngModel]="type()" (ngModelChange)="type.set($event)">
+<option value="All">All activity</option>
+@for(t of types;track t){<option [value]="t">{{t}}</option>}
+</select>
+
+<button class="reset" (click)="reset()">RESET</button>
+</div>
+
+<div class="result">
+<span><b>{{filtered().length}}</b> EVENTS FOUND</span>
+<span>NEWEST FIRST</span>
+</div>
+
+@if(loading()){
+<div class="loading">
+<i></i>
+<span>READING ACTIVITY REGISTRY...</span>
+</div>
+}@else{
+<div class="timeline">
+<div class="rail"></div>
+
+@for(item of filtered();track item.id){
+<article class="event" [style.--accent]="projectAccent(item.project_id)">
+<div class="date">
+<b>{{item.date}}</b>
+<span>{{item.type}}</span>
+</div>
+
+<div class="node"><i></i></div>
+
+<div class="card">
+<div class="event-head">
+<div>
+<span class="project">{{projectName(item.project_id)}}</span>
+@if(item.version){<span class="version">v{{item.version}}</span>}
+</div>
+<span class="type" [attr.data-type]="item.type">{{item.type}}</span>
+</div>
+
+<h3>{{item.title}}</h3>
+<p>{{item.description}}</p>
+
+<div class="event-bottom">
+<span>{{item.project_id.toUpperCase()}} / {{item.type.toUpperCase()}}</span>
+<button
+[disabled]="deleting()===item.id"
+(click)="remove(item)">
+{{deleting()===item.id?'DELETING...':'DELETE'}}
+</button>
+</div>
+</div>
+</article>
+}@empty{
+<div class="empty">
+<div>◇</div>
+<h3>NO ACTIVITY FOUND</h3>
+<p>No development events match the current filters.</p>
+<button (click)="reset()">CLEAR FILTERS</button>
+</div>
+}
+</div>
+}
+
+@if(modal()){
+<div class="overlay" (click)="modal.set(false)">
+<div class="modal" (click)="$event.stopPropagation()">
+<div class="modal-head">
+<div>
+<span>MARVILLVERSE / ACTIVITY REGISTRY</span>
+<h2>LOG DEVELOPMENT EVENT</h2>
+</div>
+<button (click)="modal.set(false)">×</button>
+</div>
+
+<div class="form">
+<label>
+PROJECT
+<select
+[ngModel]="form().project_id"
+(ngModelChange)="form.set({...form(),project_id:$event})">
+@for(p of projects.projects();track p.id){
+<option [value]="p.id">{{p.name}}</option>
+}
+</select>
+</label>
+
+<label>
+EVENT TYPE
+<select
+[ngModel]="form().type"
+(ngModelChange)="form.set({...form(),type:$event})">
+@for(t of types;track t){<option [value]="t">{{t}}</option>}
+</select>
+</label>
+
+<label>
+DATE
+<input
+type="date"
+[ngModel]="form().date"
+(ngModelChange)="form.set({...form(),date:$event})">
+</label>
+
+<label>
+VERSION
+<input
+placeholder="Optional — e.g. 0.9.0"
+[ngModel]="form().version"
+(ngModelChange)="form.set({...form(),version:$event})">
+</label>
+
+<label class="wide">
+TITLE
+<input
+placeholder="What happened?"
+[ngModel]="form().title"
+(ngModelChange)="form.set({...form(),title:$event})">
+</label>
+
+<label class="wide">
+DESCRIPTION
+<textarea
+rows="5"
+placeholder="Describe this development event..."
+[ngModel]="form().description"
+(ngModelChange)="form.set({...form(),description:$event})"></textarea>
+</label>
+</div>
+
+<div class="modal-footer">
+<span>This event becomes part of the MarvillVerse development history.</span>
+<div>
+<button (click)="modal.set(false)">CANCEL</button>
+<button class="save" [disabled]="saving()" (click)="save()">
+{{saving()?'WRITING...':'LOG EVENT'}}
+</button>
+</div>
+</div>
+</div>
+</div>
+}
+</section>

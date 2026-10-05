@@ -1,0 +1,29 @@
+﻿<section id="activity">
+<div class="head" reveal>
+<div>
+<span>02 / ACTIVITY</span>
+<h2>ALWAYS<br><b>EVOLVING.</b></h2>
+</div>
+<p>Development never really stops. Follow the releases, milestones and progress shaping the systems inside MarvillVerse.</p>
+</div>
+
+<div class="timeline" reveal>
+@for(item of items();track item.id;let i=$index){
+<article [style.--accent]="accent(item.project_id)">
+<div class="marker"><i></i><span></span></div>
+<div class="date">{{item.date}}</div>
+<div class="content">
+<div class="meta">
+<span>{{name(item.project_id)}}</span>
+<b>{{item.type}}</b>
+@if(item.version){<i>v{{item.version}}</i>}
+</div>
+<h3>{{item.title}}</h3>
+<p>{{item.description}}</p>
+</div>
+</article>
+}@empty{
+<div class="empty">DEVELOPMENT SIGNALS WILL APPEAR HERE.</div>
+}
+</div>
+</section>

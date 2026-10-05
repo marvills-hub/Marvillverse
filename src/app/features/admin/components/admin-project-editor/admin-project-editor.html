@@ -1,0 +1,149 @@
+﻿<div class="overlay" (click)="cancel.emit()">
+<div class="editor" (click)="$event.stopPropagation()">
+<div class="head">
+<div>
+<span>MARVILLVERSE / PROJECT REGISTRY</span>
+<h2>{{isExisting()?'EDIT SYSTEM':'CREATE SYSTEM'}}</h2>
+</div>
+<button (click)="cancel.emit()">×</button>
+</div>
+
+<div class="form">
+<div class="section-title wide"><span>01</span><b>IDENTITY</b></div>
+
+<label>
+NAME
+<input [(ngModel)]="form.name" (ngModelChange)="slug()" placeholder="Project name">
+</label>
+
+<label>
+PROJECT ID
+<input [(ngModel)]="form.id" [disabled]="isExisting()" placeholder="project-id">
+</label>
+
+<label class="wide">
+TAGLINE
+<input [(ngModel)]="form.tagline" placeholder="Short description of the system">
+</label>
+
+<label class="wide">
+DESCRIPTION
+<textarea [(ngModel)]="form.description" rows="4" placeholder="What does this project do?"></textarea>
+</label>
+
+<div class="section-title wide"><span>02</span><b>DEVELOPMENT</b></div>
+
+<label>
+CATEGORY
+<select [(ngModel)]="form.category">
+<option>AI</option>
+<option>Productivity</option>
+<option>Platform</option>
+<option>Internal</option>
+</select>
+</label>
+
+<label>
+STATUS
+<select [(ngModel)]="form.status">
+<option>Active</option>
+<option>Building</option>
+<option>Planned</option>
+</select>
+</label>
+
+<label>
+VERSION
+<input [(ngModel)]="form.version" placeholder="0.1.0">
+</label>
+
+<label>
+PROGRESS
+<div class="progress-input">
+<input type="range" min="0" max="100" [(ngModel)]="form.progress">
+<b>{{form.progress}}%</b>
+</div>
+</label>
+
+<label>
+MONOGRAM
+<input maxlength="2" [(ngModel)]="form.monogram">
+</label>
+
+<label>
+ACCENT
+<div class="color">
+<input type="color" [(ngModel)]="form.accent">
+<input [(ngModel)]="form.accent">
+</div>
+</label>
+
+<label>
+STARTED
+<input type="date" [(ngModel)]="form.started">
+</label>
+
+<label>
+UPDATED
+<input [value]="form.updated" disabled>
+</label>
+
+<div class="section-title wide"><span>03</span><b>TECHNOLOGY & PLATFORMS</b></div>
+
+<label class="wide">
+TECHNOLOGY
+<input [ngModel]="techText" (ngModelChange)="techText=$event" placeholder="Angular, Cloudflare, AI">
+<small>Separate technologies with commas.</small>
+</label>
+
+<label class="wide">
+PLATFORMS
+<input [ngModel]="platformText" (ngModelChange)="platformText=$event" placeholder="Web, Desktop, Mobile">
+<small>Separate platforms with commas.</small>
+</label>
+
+<div class="section-title wide"><span>04</span><b>PRODUCT VISION</b></div>
+
+<label class="wide">
+VISION
+<textarea [(ngModel)]="form.vision" rows="4" placeholder="The long-term vision for this project"></textarea>
+</label>
+
+<label class="wide">
+CORE CAPABILITIES
+<textarea [ngModel]="capabilityText" (ngModelChange)="capabilityText=$event" rows="6" placeholder="One capability per line"></textarea>
+</label>
+
+<div class="section-title wide"><span>05</span><b>LINKS & VISIBILITY</b></div>
+
+<label class="wide">
+WEBSITE
+<input [(ngModel)]="form.website" placeholder="https://">
+</label>
+
+<label class="wide">
+GITHUB
+<input [(ngModel)]="form.github" placeholder="https://github.com/...">
+</label>
+
+<label class="check wide">
+<input type="checkbox" [(ngModel)]="form.featured">
+<span><b>FEATURED PROJECT</b><small>Give this project additional visibility across MarvillVerse.</small></span>
+</label>
+</div>
+
+@if(error()){
+<div class="error">{{error()}}</div>
+}
+
+<div class="footer">
+<span>Changes are written directly to the Cloudflare D1 registry.</span>
+<div>
+<button (click)="cancel.emit()">CANCEL</button>
+<button class="save" [disabled]="saving()" (click)="save()">
+{{saving()?'SAVING...':'SAVE SYSTEM'}}
+</button>
+</div>
+</div>
+</div>
+</div>

@@ -1,0 +1,34 @@
+﻿<section reveal>
+<div class="head">
+<div><span>LIVE ECOSYSTEM</span><h2>SYSTEM<br>TELEMETRY.</h2></div>
+<div class="online"><i></i>MARVILLVERSE ONLINE</div>
+</div>
+
+<div class="console">
+<div class="bars">
+@for(project of projects();track project.id){
+<div class="row">
+<span>{{project.name}}</span>
+<div><i [style.width.%]="project.progress" [style.--accent]="project.accent"></i></div>
+<b>{{project.progress}}%</b>
+</div>
+}
+</div>
+
+<div class="radar">
+<div class="r r1"></div><div class="r r2"></div><div class="r r3"></div>
+<div class="sweep"></div>
+<i class="dot d1"></i><i class="dot d2"></i><i class="dot d3"></i>
+<strong>{{avg()}}<small>%</small></strong>
+<span>AVERAGE<br>DEVELOPMENT</span>
+</div>
+
+<div class="feed">
+<span>ACTIVITY STREAM</span>
+@for(project of projects().slice(0,4);track project.id){
+<p><i></i>{{project.name.toUpperCase()}} / {{project.status.toLowerCase()}}</p>
+}
+<small>ALL SYSTEMS NOMINAL</small>
+</div>
+</div>
+</section>

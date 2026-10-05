@@ -1,0 +1,13 @@
+﻿<section id="activity">
+<div class="head" reveal><div><span>03 / ACTIVITY</span><h2>BUILD<br>LOG.</h2></div><p>The latest milestones and development movements across the MarvillVerse ecosystem.</p></div>
+<div class="timeline">
+@for(item of activities();track item.date+item.projectId;let i=$index){
+@if(project(item.projectId);as p){
+<div class="event" reveal [style.--accent]="p.accent" [style.--delay]="i*80+'ms'">
+<div class="date">{{item.date}}</div><div class="rail"><i></i></div>
+<div class="info"><div><span>{{item.type}}</span><b>{{p.name}}</b></div><h3>{{item.title}}</h3><p>{{item.description}}</p></div>
+</div>
+}
+}
+</div>
+</section>

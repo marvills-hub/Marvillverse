@@ -1,0 +1,7 @@
+﻿<div class="source" [class.cloud]="service.source()==='cloud'">
+<i></i>
+<div>
+<span>{{service.source()==='cloud'?'CLOUD REGISTRY':'LOCAL REGISTRY'}}</span>
+<small>{{service.loading()?'CONNECTING...':service.source()==='cloud'?'D1 ONLINE':'API OFFLINE · FALLBACK ACTIVE'}}</small>
+</div>
+</div>

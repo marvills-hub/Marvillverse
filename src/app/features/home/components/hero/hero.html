@@ -1,0 +1,36 @@
+﻿<section class="hero" id="top">
+<div class="aurora a1"></div><div class="aurora a2"></div>
+<div class="grid"></div><div class="scan"></div>
+<div class="content">
+<div class="eyebrow"><span></span> THE MARVILLS SOFTWARE UNIVERSE</div>
+<h1><span class="white">IDEAS</span><br><span class="white">BECOME</span><br><span class="worlds">WORLDS.</span></h1>
+<p>A growing universe of software, intelligent systems and digital experiences — designed, engineered and brought to life by Marvills.</p>
+<div class="actions">
+<a class="primary magnetic" href="#projects">Explore the universe <span>↓</span></a>
+<a class="secondary" href="#about">Discover Marvills</a>
+</div>
+</div>
+
+<div class="universe" [style.transform]="transform()">
+<div class="halo h1"></div><div class="halo h2"></div><div class="halo h3"></div>
+<div class="axis x"></div><div class="axis y"></div>
+<div class="planet-core"><span>M</span><i></i><small>MARVILLVERSE</small></div>
+
+@for(project of projects();track project.id;let i=$index){
+<div class="planet" [class]="'planet p'+i" [style.--accent]="project.accent">
+<div class="planet-dot">{{project.monogram}}</div>
+<div class="planet-label"><b>{{project.name}}</b><small>{{project.category}}</small></div>
+</div>
+}
+
+<div class="coordinates">MV // SYSTEM 01<br>{{projectCount().toString().padStart(2,'0')}} OBJECTS DETECTED</div>
+</div>
+
+<div class="signal">
+<span></span>
+<b>{{projectCount().toString().padStart(2,'0')}}</b>
+<small>SYSTEMS IN ORBIT</small>
+</div>
+
+<div class="scroll">SCROLL TO EXPLORE <span>↓</span></div>
+</section>
