@@ -1,0 +1,8 @@
+﻿:host{position:fixed;inset:0;z-index:1;pointer-events:none;display:block;}
+.fluid-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.fluid-layer>canvas{position:absolute!important;inset:0!important;z-index:0!important;pointer-events:none!important}
+.vortex-head{position:fixed;left:0;top:0;z-index:1;opacity:0;pointer-events:none;will-change:transform,opacity;transition:opacity .14s ease;mix-blend-mode:screen}
+@media(pointer:coarse){:host{display:none}}
+
+
+

@@ -1,0 +1,333 @@
+﻿interface P{
+x:number;
+y:number;
+px:number;
+py:number;
+vx:number;
+vy:number;
+age:number;
+life:number;
+band:number;
+seed:number;
+}
+export class FluidEngine{
+private ctx:CanvasRenderingContext2D;
+private particles:P[]=[];
+private frame=0;
+private running=true;
+private dpr=1;
+private last=performance.now();
+private initialized=false;
+private x=0;
+private y=0;
+private sx=0;
+private sy=0;
+private lx=0;
+private ly=0;
+private emitDistance=0;
+constructor(private canvas:HTMLCanvasElement){
+const ctx=canvas.getContext('2d',{alpha:true});
+if(!ctx)throw new Error('Canvas unavailable');
+this.ctx=ctx;
+this.resize();
+this.loop();
+}
+resize(){
+this.dpr=Math.min(devicePixelRatio||1,1.25);
+const w=Math.floor(innerWidth*this.dpr);
+const h=Math.floor(innerHeight*this.dpr);
+if(this.canvas.width===w&&this.canvas.height===h)return;
+this.canvas.width=w;
+this.canvas.height=h;
+this.canvas.style.width=`${innerWidth}px`;
+this.canvas.style.height=`${innerHeight}px`;
+}
+move(x:number,y:number){
+this.x=x;
+this.y=y;
+if(!this.initialized){
+this.initialized=true;
+this.sx=this.lx=x;
+this.sy=this.ly=y;
+return;
+}
+this.sx+=(x-this.sx)*.52;
+this.sy+=(y-this.sy)*.52;
+const dx=this.sx-this.lx;
+const dy=this.sy-this.ly;
+const d=Math.hypot(dx,dy);
+this.emitDistance+=d;
+if(this.emitDistance>=6&&d>.1){
+this.emit(this.sx,this.sy,dx,dy);
+this.emitDistance=0;
+}
+this.lx=this.sx;
+this.ly=this.sy;
+}
+burst(x:number,y:number){
+for(let i=0;i<18;i++){
+const a=i/18*Math.PI*2;
+this.particles.push({
+x,y,px:x,py:y,
+vx:Math.cos(a)*(1+Math.random()*2),
+vy:Math.sin(a)*(1+Math.random()*2),
+age:0,
+life:30+Math.random()*15,
+band:i%5,
+seed:Math.random()*100
+});
+}
+this.trim();
+}
+private emit(x:number,y:number,dx:number,dy:number){
+const d=Math.hypot(dx,dy)||1;
+const tx=dx/d;
+const ty=dy/d;
+const nx=-ty;
+const ny=tx;
+
+/*
+Only seven separated streams.
+
+0 = bright center
+1/2 = close cyan/violet streams
+3/4 = outer fluid folds
+5/6 = sparse membranes
+*/
+const offsets=[0,-7,8,-20,22,-38,40];
+
+for(let i=0;i<offsets.length;i++){
+const offset=offsets[i];
+const jitter=i===0?0:(Math.random()-.5)*3;
+const o=offset+jitter;
+const speed=.55+Math.min(d,20)*.025;
+this.particles.push({
+x:x+nx*o,
+y:y+ny*o,
+px:x+nx*o,
+py:y+ny*o,
+vx:tx*speed+nx*(Math.random()-.5)*.18,
+vy:ty*speed+ny*(Math.random()-.5)*.18,
+age:0,
+life:i<3?55+Math.random()*15:42+Math.random()*18,
+band:i,
+seed:Math.random()*100
+});
+}
+this.trim();
+}
+private trim(){
+const MAX=620;
+if(this.particles.length>MAX){
+this.particles.splice(0,this.particles.length-MAX);
+}
+}
+private update(dt:number){
+const t=performance.now()*.00022;
+for(const p of this.particles){
+p.age+=dt;
+p.px=p.x;
+p.py=p.y;
+
+const life=p.age/p.life;
+
+/*
+Cheap organic curl.
+
+No per-particle multi-octave noise.
+No expensive field sampling.
+No Path2D generation.
+*/
+const curl=
+Math.sin(p.x*.0055+p.seed+t)+
+Math.cos(p.y*.0047-p.seed*.37-t*.73);
+
+const curl2=
+Math.sin((p.x+p.y)*.0028+p.seed*.23-t*.41);
+
+const force=(p.band>=3?.013:.007)*(1+life*.8);
+const angle=(curl*.68+curl2*.32)*1.7;
+
+p.vx+=Math.cos(angle)*force*dt;
+p.vy+=Math.sin(angle)*force*dt;
+
+if(p.band>=3){
+const dx=p.x-this.sx;
+const dy=p.y-this.sy;
+const dist=Math.hypot(dx,dy)+1;
+if(dist<150){
+const spin=(1-dist/150)*.007*(p.band%2?1:-1);
+p.vx+=(-dy/dist)*spin*dt;
+p.vy+=(dx/dist)*spin*dt;
+}
+}
+
+p.vx*=.987;
+p.vy*=.987;
+p.x+=p.vx*dt;
+p.y+=p.vy*dt;
+}
+this.particles=this.particles.filter(p=>p.age<p.life);
+}
+private render(){
+const ctx=this.ctx;
+ctx.setTransform(this.dpr,0,0,this.dpr,0,0);
+ctx.clearRect(0,0,innerWidth,innerHeight);
+
+ctx.save();
+ctx.globalCompositeOperation='lighter';
+ctx.lineCap='round';
+ctx.lineJoin='round';
+
+/*
+OUTER LIQUID FOLDS
+
+One inexpensive pass.
+No shadowBlur.
+Low opacity means the page remains readable.
+*/
+for(const p of this.particles){
+if(p.band<3)continue;
+const f=Math.max(0,1-p.age/p.life);
+if(f<=.02)continue;
+
+let color:string;
+let width:number;
+let alpha:number;
+
+if(p.band===3){
+color=`rgba(176,83,255,${f*.15})`;
+width=3.2;
+alpha=1;
+}else if(p.band===4){
+color=`rgba(62,189,255,${f*.14})`;
+width=3;
+alpha=1;
+}else{
+color=p.band===5
+?`rgba(116,76,255,${f*.055})`
+:`rgba(65,165,255,${f*.05})`;
+width=5;
+alpha=1;
+}
+
+ctx.globalAlpha=alpha;
+ctx.strokeStyle=color;
+ctx.lineWidth=width;
+ctx.beginPath();
+ctx.moveTo(p.px,p.py);
+ctx.lineTo(p.x,p.y);
+ctx.stroke();
+}
+
+/*
+CLOSE COLORED STREAMS
+*/
+for(const p of this.particles){
+if(p.band!==1&&p.band!==2)continue;
+const f=Math.max(0,1-p.age/p.life);
+if(f<=.02)continue;
+
+ctx.globalAlpha=1;
+ctx.lineWidth=2;
+
+ctx.strokeStyle=p.band===1
+?`rgba(190,83,255,${f*.34})`
+:`rgba(73,207,255,${f*.34})`;
+
+ctx.beginPath();
+ctx.moveTo(p.px,p.py);
+ctx.lineTo(p.x,p.y);
+ctx.stroke();
+}
+
+/*
+CENTER RIVER
+
+Only this stream receives a glow.
+That changes hundreds/thousands of blur operations
+into one tiny compositing pass.
+*/
+ctx.shadowBlur=8;
+ctx.shadowColor='rgba(111,210,255,.55)';
+
+for(const p of this.particles){
+if(p.band!==0)continue;
+const f=Math.max(0,1-p.age/p.life);
+if(f<=.02)continue;
+
+ctx.lineWidth=2.7;
+ctx.strokeStyle=`rgba(103,207,255,${f*.42})`;
+ctx.beginPath();
+ctx.moveTo(p.px,p.py);
+ctx.lineTo(p.x,p.y);
+ctx.stroke();
+}
+
+ctx.shadowBlur=3;
+ctx.shadowColor='rgba(255,255,255,.7)';
+
+for(const p of this.particles){
+if(p.band!==0)continue;
+const f=Math.max(0,1-p.age/p.life);
+if(f<=.02)continue;
+
+ctx.lineWidth=.85;
+ctx.strokeStyle=`rgba(255,255,255,${f*.88})`;
+ctx.beginPath();
+ctx.moveTo(p.px,p.py);
+ctx.lineTo(p.x,p.y);
+ctx.stroke();
+}
+
+ctx.restore();
+
+this.head();
+}
+private head(){
+if(!this.initialized)return;
+const ctx=this.ctx;
+const g=ctx.createRadialGradient(
+this.sx,this.sy,0,
+this.sx,this.sy,15
+);
+g.addColorStop(0,'rgba(255,255,255,.95)');
+g.addColorStop(.12,'rgba(190,242,255,.72)');
+g.addColorStop(.35,'rgba(93,196,255,.22)');
+g.addColorStop(.58,'rgba(174,76,255,.10)');
+g.addColorStop(1,'rgba(100,70,255,0)');
+
+ctx.save();
+ctx.globalCompositeOperation='lighter';
+ctx.fillStyle=g;
+ctx.beginPath();
+ctx.arc(this.sx,this.sy,15,0,Math.PI*2);
+ctx.fill();
+ctx.restore();
+}
+private loop=()=>{
+if(!this.running)return;
+
+const now=performance.now();
+const elapsed=now-this.last;
+
+/*
+Cap rendering near 60fps.
+No runaway frame workload.
+*/
+if(elapsed>=15){
+const dt=Math.min(elapsed/16.667,1.5);
+this.last=now;
+this.resize();
+this.update(dt);
+this.render();
+}
+
+this.frame=requestAnimationFrame(this.loop);
+}
+destroy(){
+this.running=false;
+cancelAnimationFrame(this.frame);
+this.particles.length=0;
+}
+}

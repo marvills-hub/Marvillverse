@@ -1,0 +1,54 @@
+﻿import{AfterViewInit,Component,ElementRef,HostListener,NgZone,OnDestroy,viewChild}from'@angular/core';
+import{FluidEngine}from'./fluid-engine';
+@Component({
+selector:'app-cursor',
+templateUrl:'./cursor.html',
+styleUrl:'./cursor.scss'
+})
+export class Cursor implements AfterViewInit,OnDestroy{
+readonly canvas=viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
+readonly core=viewChild.required<ElementRef<HTMLElement>>('core');
+private engine?:FluidEngine;
+private x=-100;
+private y=-100;
+private initialized=false;
+private textMode=false;
+constructor(private zone:NgZone){}
+ngAfterViewInit(){
+if(matchMedia('(pointer:coarse)').matches||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+this.zone.runOutsideAngular(()=>{
+try{this.engine=new FluidEngine(this.canvas().nativeElement)}
+catch{this.canvas().nativeElement.style.display='none'}
+});
+}
+ngOnDestroy(){this.engine?.destroy()}
+@HostListener('document:mousemove',['$event'])
+move(e:MouseEvent){
+const dx=this.initialized?e.clientX-this.x:0;
+const dy=this.initialized?e.clientY-this.y:0;
+this.x=e.clientX;
+this.y=e.clientY;
+this.initialized=true;
+const core=this.core().nativeElement;
+core.style.transform=`translate3d(${this.x}px,${this.y}px,0)`;
+core.style.opacity=this.textMode?'0':'1';
+if(!this.textMode&&Math.hypot(dx,dy)>.15)this.engine?.splat(this.x,this.y,dx,dy);
+}
+@HostListener('document:mouseover',['$event'])
+over(e:MouseEvent){
+const target=e.target as HTMLElement;
+this.textMode=!!target.closest('input,textarea,select,[contenteditable="true"]');
+const interactive=!!target.closest('a,button,[role="button"],article,.planet,.project-card');
+this.core().nativeElement.classList.toggle('interactive',interactive&&!this.textMode);
+this.canvas().nativeElement.classList.toggle('dimmed',this.textMode);
+}
+@HostListener('document:mousedown')
+down(){
+if(!this.textMode){
+this.core().nativeElement.classList.add('pressed');
+this.engine?.burst(this.x,this.y);
+}
+}
+@HostListener('document:mouseup')
+up(){this.core().nativeElement.classList.remove('pressed')}
+}

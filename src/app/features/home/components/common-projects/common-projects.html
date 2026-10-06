@@ -1,0 +1,46 @@
+﻿@if(projects().length){
+<section id="common-projects">
+<div class="head" reveal>
+<div>
+<span>COMMON PROJECTS</span>
+<h2>BUILT BEYOND<br><b>THE UNIVERSE.</b></h2>
+</div>
+<p>Websites, internal platforms and collaborative systems created for organizations, teams and shared initiatives.</p>
+</div>
+
+<div class="grid">
+@for(p of projects();track p.id){
+<article reveal [style.--accent]="p.accent">
+<div class="top">
+<i>{{p.monogram}}</i>
+<div class="status"><span></span>{{p.status}}</div>
+</div>
+
+<div class="type">{{p.category}} / COMMON PROJECT</div>
+<h3>{{p.name}}</h3>
+<h4>{{p.tagline}}</h4>
+<p>{{p.description}}</p>
+
+<div class="meta">
+<div><span>PROGRESS</span><b>{{p.progress}}%</b></div>
+<div><span>VERSION</span><b>v{{p.version}}</b></div>
+<div><span>UPDATED</span><b>{{p.updated}}</b></div>
+</div>
+
+<div class="bar"><i [style.width.%]="p.progress"></i></div>
+
+<div class="tech">
+@for(t of p.tech.slice(0,5);track t){<span>{{t}}</span>}
+</div>
+
+@if(p.website||p.github||p.sourceUrl){
+<div class="links">
+@if(p.website){<button (click)="open(p.website)">VISIT PROJECT ↗</button>}
+@if(p.sourceUrl||p.github){<button (click)="open(p.sourceUrl||p.github)">SOURCE ↗</button>}
+</div>
+}
+</article>
+}
+</div>
+</section>
+}

@@ -31,6 +31,7 @@ tagline:'',
 description:'',
 category:'Productivity',
 status:'Building',
+projectKind:'tool',
 platforms:[],
 tech:[],
 monogram:'',
@@ -43,7 +44,11 @@ featured:false,
 vision:'',
 capabilities:[],
 github:'',
-website:''
+website:'',
+sourceUrl:'',
+windowsUrl:'',
+androidUrl:'',
+iosUrl:''
 };
 }
 get techText(){return(this.form.tech||[]).join(', ')}
@@ -98,3 +103,4 @@ this.saving.set(false);
 }
 }
 }
+

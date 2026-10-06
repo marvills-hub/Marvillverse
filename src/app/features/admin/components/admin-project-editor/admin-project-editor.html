@@ -33,6 +33,14 @@ DESCRIPTION
 
 <div class="section-title wide"><span>02</span><b>DEVELOPMENT</b></div>
 
+
+<label>
+PROJECT TYPE
+<select [(ngModel)]="form.projectKind">
+<option value="tool">Marvills Tool / Software</option>
+<option value="common">Common Project</option>
+</select>
+</label>
 <label>
 CATEGORY
 <select [(ngModel)]="form.category">
@@ -126,6 +134,26 @@ GITHUB
 <input [(ngModel)]="form.github" placeholder="https://github.com/...">
 </label>
 
+
+<label class="wide">
+SOURCE CODE / REPOSITORY
+<input [(ngModel)]="form.sourceUrl" placeholder="https://github.com/...">
+</label>
+
+<label class="wide">
+WINDOWS DOWNLOAD
+<input [(ngModel)]="form.windowsUrl" placeholder="https://.../application.exe">
+</label>
+
+<label class="wide">
+ANDROID APP
+<input [(ngModel)]="form.androidUrl" placeholder="https://.../application.apk or store URL">
+</label>
+
+<label class="wide">
+iOS APP
+<input [(ngModel)]="form.iosUrl" placeholder="App Store / installation URL">
+</label>
 <label class="check wide">
 <input type="checkbox" [(ngModel)]="form.featured">
 <span><b>FEATURED PROJECT</b><small>Give this project additional visibility across MarvillVerse.</small></span>
@@ -147,3 +175,4 @@ GITHUB
 </div>
 </div>
 </div>
+

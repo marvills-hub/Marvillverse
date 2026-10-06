@@ -1,0 +1,158 @@
+﻿export class FluidText{
+private canvas:HTMLCanvasElement;
+private ctx:CanvasRenderingContext2D;
+private source=document.createElement('canvas');
+private sourceCtx:CanvasRenderingContext2D;
+private host:HTMLElement;
+private raf=0;
+private active=false;
+private dirty=true;
+private pointer={x:0,y:0,px:0,py:0,vx:0,vy:0};
+private blobs:{x:number;y:number;vx:number;vy:number;life:number;size:number}[]=[];
+private width=1;
+private height=1;
+private dpr=1;
+private ro:ResizeObserver;
+constructor(canvas:HTMLCanvasElement,host:HTMLElement){
+this.canvas=canvas;
+this.host=host;
+const ctx=canvas.getContext('2d',{alpha:true});
+const sourceCtx=this.source.getContext('2d',{alpha:true});
+if(!ctx||!sourceCtx)throw new Error('Fluid text canvas unavailable');
+this.ctx=ctx;
+this.sourceCtx=sourceCtx;
+this.ro=new ResizeObserver(()=>this.resize());
+this.ro.observe(host);
+this.resize();
+this.raf=requestAnimationFrame(()=>this.frame());
+}
+private resize(){
+const r=this.host.getBoundingClientRect();
+this.dpr=Math.min(devicePixelRatio||1,2);
+this.width=Math.max(1,Math.ceil(r.width));
+this.height=Math.max(1,Math.ceil(r.height));
+this.canvas.width=Math.ceil(this.width*this.dpr);
+this.canvas.height=Math.ceil(this.height*this.dpr);
+this.source.width=this.canvas.width;
+this.source.height=this.canvas.height;
+this.canvas.style.width=`${this.width}px`;
+this.canvas.style.height=`${this.height}px`;
+this.ctx.setTransform(this.dpr,0,0,this.dpr,0,0);
+this.sourceCtx.setTransform(this.dpr,0,0,this.dpr,0,0);
+this.dirty=true;
+}
+capture(){
+this.sourceCtx.save();
+this.sourceCtx.setTransform(1,0,0,1,0,0);
+this.sourceCtx.clearRect(0,0,this.source.width,this.source.height);
+this.sourceCtx.restore();
+const hostRect=this.host.getBoundingClientRect();
+const letters=this.host.querySelectorAll('.play-letter') as NodeListOf<HTMLElement>;
+this.sourceCtx.textBaseline='alphabetic';
+letters.forEach(letter=>{
+const r=letter.getBoundingClientRect();
+const cs=getComputedStyle(letter);
+const text=letter.textContent||'';
+const size=parseFloat(cs.fontSize);
+const weight=cs.fontWeight;
+const family=cs.fontFamily;
+this.sourceCtx.font=`${weight} ${size}px ${family}`;
+this.sourceCtx.fillStyle=letter.closest('.worlds')?'#7065ff':'#f5f5f7';
+const x=r.left-hostRect.left;
+const y=r.top-hostRect.top+r.height*.79;
+this.sourceCtx.fillText(text,x,y);
+});
+this.dirty=false;
+}
+move(event:MouseEvent){
+if(this.active===false){
+this.pointer.px=event.clientX;
+this.pointer.py=event.clientY;
+}
+const rect=this.host.getBoundingClientRect();
+const x=event.clientX-rect.left;
+const y=event.clientY-rect.top;
+this.pointer.vx=event.clientX-this.pointer.px;
+this.pointer.vy=event.clientY-this.pointer.py;
+this.pointer.px=event.clientX;
+this.pointer.py=event.clientY;
+this.pointer.x=x;
+this.pointer.y=y;
+this.active=true;
+const speed=Math.min(30,Math.hypot(this.pointer.vx,this.pointer.vy));
+const count=Math.max(2,Math.min(8,Math.ceil(speed/3)));
+for(let i=0;i<count;i++){
+const t=i/Math.max(1,count-1);
+this.blobs.push({
+x:x-this.pointer.vx*t,
+y:y-this.pointer.vy*t,
+vx:-this.pointer.vx*(.16+Math.random()*.13)+(Math.random()-.5)*2,
+vy:-this.pointer.vy*(.16+Math.random()*.13)+(Math.random()-.5)*2,
+life:1,
+size:26+speed*1.5+Math.random()*24
+});
+}
+if(this.blobs.length>90)this.blobs.splice(0,this.blobs.length-90);
+}
+leave(){this.active=false}
+refresh(){this.dirty=true}
+private frame(){
+if(this.dirty)this.capture();
+this.ctx.clearRect(0,0,this.width,this.height);
+if(this.blobs.length){
+this.ctx.save();
+this.ctx.globalCompositeOperation='source-over';
+this.blobs.forEach(blob=>{
+blob.x+=blob.vx;
+blob.y+=blob.vy;
+blob.vx*=.94;
+blob.vy*=.94;
+blob.life*=.925;
+blob.size*=.996;
+const alpha=Math.max(0,blob.life);
+if(alpha<.025)return;
+const radius=Math.max(8,blob.size);
+const sx=Math.max(0,blob.x-radius);
+const sy=Math.max(0,blob.y-radius);
+const sw=Math.min(this.width-sx,radius*2);
+const sh=Math.min(this.height-sy,radius*2);
+if(sw<=0||sh<=0)return;
+const stretchX=blob.vx*1.8;
+const stretchY=blob.vy*1.8;
+this.ctx.save();
+this.ctx.globalAlpha=alpha*.78;
+this.ctx.filter=`blur(${Math.max(0,(1-alpha)*2.2)}px)`;
+this.ctx.drawImage(
+this.source,
+sx*this.dpr,sy*this.dpr,sw*this.dpr,sh*this.dpr,
+sx+stretchX,sy+stretchY,sw,sh
+);
+this.ctx.restore();
+});
+this.ctx.restore();
+this.ctx.save();
+this.ctx.globalCompositeOperation='screen';
+this.blobs.forEach(blob=>{
+if(blob.life<.05)return;
+const g=this.ctx.createRadialGradient(blob.x,blob.y,0,blob.x,blob.y,blob.size*.7);
+g.addColorStop(0,`rgba(235,229,255,${blob.life*.12})`);
+g.addColorStop(.34,`rgba(128,102,255,${blob.life*.09})`);
+g.addColorStop(.7,`rgba(89,207,255,${blob.life*.035})`);
+g.addColorStop(1,'rgba(89,207,255,0)');
+this.ctx.fillStyle=g;
+this.ctx.beginPath();
+this.ctx.arc(blob.x,blob.y,blob.size*.7,0,Math.PI*2);
+this.ctx.fill();
+});
+this.ctx.restore();
+this.blobs=this.blobs.filter(blob=>blob.life>.025);
+}
+this.canvas.style.opacity=this.blobs.length?'1':'0';
+this.raf=requestAnimationFrame(()=>this.frame());
+}
+destroy(){
+cancelAnimationFrame(this.raf);
+this.ro.disconnect();
+this.blobs=[];
+}
+}

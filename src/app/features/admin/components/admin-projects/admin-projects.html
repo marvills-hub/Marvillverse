@@ -70,7 +70,7 @@ placeholder="Search projects, technology, platforms..."
 <h3>{{p.name}}</h3>
 @if(p.featured){<span class="featured">★ FEATURED</span>}
 </div>
-<p>{{p.tagline}}</p>
+<p>{{p.tagline}}</p>@if(p.projectKind==="tool"){<span class="kind tool">MARVILLS TOOL</span>}@else{<span class="kind common">COMMON PROJECT</span>}
 </div>
 </div>
 
@@ -157,3 +157,4 @@ class="delete"
 (cancel)="editor.set(false)"
 (saved)="saved()"/>
 }
+

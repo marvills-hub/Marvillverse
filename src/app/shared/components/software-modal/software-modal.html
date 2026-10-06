@@ -1,0 +1,123 @@
+﻿<div class="backdrop" (click)="close.emit()">
+<div class="modal" (click)="$event.stopPropagation()" [style.--accent]="project().accent">
+<div class="glow"></div>
+
+<header>
+<div class="identity">
+<i>{{project().monogram}}</i>
+<div>
+<span>MARVILLS SOFTWARE</span>
+<h2>{{project().name}}</h2>
+<p>{{project().tagline}}</p>
+</div>
+</div>
+<button class="close" (click)="close.emit()">×</button>
+</header>
+
+<div class="body">
+<div class="intro">
+<p>{{project().description}}</p>
+</div>
+
+<div class="stats">
+<div><span>STATUS</span><b>{{project().status}}</b></div>
+<div><span>VERSION</span><b>v{{project().version}}</b></div>
+<div><span>PROGRESS</span><b>{{project().progress}}%</b></div>
+<div><span>UPDATED</span><b>{{project().updated}}</b></div>
+</div>
+
+<div class="progress">
+<span><i [style.width.%]="project().progress"></i></span>
+</div>
+
+@if(project().tech.length){
+<div class="block">
+<label>TECHNOLOGY</label>
+<div class="chips">
+@for(t of project().tech;track t){<span>{{t}}</span>}
+</div>
+</div>
+}
+
+@if(project().platforms.length){
+<div class="block">
+<label>PLATFORMS</label>
+<div class="chips platforms">
+@for(p of project().platforms;track p){<span>{{p}}</span>}
+</div>
+</div>
+}
+
+@if(project().vision){
+<div class="vision">
+<label>VISION</label>
+<p>{{project().vision}}</p>
+</div>
+}
+
+<div class="access">
+<div class="access-head">
+<div>
+<label>SOFTWARE ACCESS</label>
+<h3>USE {{project().name.toUpperCase()}}</h3>
+</div>
+<span>AVAILABLE OPTIONS ONLY</span>
+</div>
+
+<div class="access-grid">
+@if(project().sourceUrl||project().github){
+<button (click)="open(project().sourceUrl||project().github)">
+<i>&lt;/&gt;</i>
+<span><b>SOURCE CODE</b><small>View repository</small></span>
+<strong>↗</strong>
+</button>
+}
+
+@if(project().website){
+<button (click)="open(project().website)">
+<i>◎</i>
+<span><b>OPEN WEBSITE</b><small>Launch web version</small></span>
+<strong>↗</strong>
+</button>
+}
+
+@if(project().windowsUrl){
+<button (click)="open(project().windowsUrl)">
+<i>⊞</i>
+<span><b>WINDOWS APP</b><small>Download .exe</small></span>
+<strong>↓</strong>
+</button>
+}
+
+@if(project().androidUrl){
+<button (click)="open(project().androidUrl)">
+<i>◆</i>
+<span><b>ANDROID APP</b><small>Download / install</small></span>
+<strong>↓</strong>
+</button>
+}
+
+@if(project().iosUrl){
+<button (click)="open(project().iosUrl)">
+<i>●</i>
+<span><b>iOS APP</b><small>Open mobile app</small></span>
+<strong>↗</strong>
+</button>
+}
+
+@if(!project().sourceUrl&&!project().github&&!project().website&&!project().windowsUrl&&!project().androidUrl&&!project().iosUrl){
+<div class="unavailable">
+<i>◇</i>
+<div><b>DISTRIBUTION COMING SOON</b><span>No public builds or links have been registered yet.</span></div>
+</div>
+}
+</div>
+</div>
+</div>
+
+<footer>
+<span>MARVILLVERSE // {{project().id.toUpperCase()}}</span>
+<button (click)="close.emit()">CLOSE</button>
+</footer>
+</div>
+</div>

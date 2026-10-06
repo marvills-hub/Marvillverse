@@ -8,11 +8,12 @@ import{Projects}from'./components/projects/projects';
 import{Marquee}from'./components/marquee/marquee';
 import{Telemetry}from'./components/telemetry/telemetry';
 import{ActivityStream}from'./components/activity-stream/activity-stream';
+import{CommonProjects}from'./components/common-projects/common-projects';
 import{Ecosystem}from'./components/ecosystem/ecosystem';
 import{About}from'./components/about/about';
 @Component({
 selector:'app-home',
-imports:[Header,Footer,Cursor,ScrollProgress,Hero,Projects,Marquee,Telemetry,ActivityStream,Ecosystem,About],
+imports:[Header,Footer,Cursor,ScrollProgress,Hero,Projects,Marquee,Telemetry,CommonProjects,ActivityStream,Ecosystem,About],
 templateUrl:'./home.html',
 styleUrl:'./home.scss'
 })

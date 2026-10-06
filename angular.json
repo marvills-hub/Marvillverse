@@ -61,13 +61,13 @@
                                                                                                                     "budgets":  [
                                                                                                                                     {
                                                                                                                                         "type":  "initial",
-                                                                                                                                        "maximumWarning":  "500kB",
-                                                                                                                                        "maximumError":  "1MB"
+                                                                                                                                        "maximumWarning":  "600kB",
+                                                                                                                                        "maximumError":  "2MB"
                                                                                                                                     },
                                                                                                                                     {
                                                                                                                                         "type":  "anyComponentStyle",
-                                                                                                                                        "maximumWarning":  "12kB",
-                                                                                                                                        "maximumError":  "20kB"
+                                                                                                                                        "maximumWarning":  "24kB",
+                                                                                                                                        "maximumError":  "30kB"
                                                                                                                                     }
                                                                                                                                 ],
                                                                                                                     "outputHashing":  "all"

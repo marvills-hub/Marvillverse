@@ -1,0 +1,107 @@
+﻿:host{
+position:fixed;
+inset:0;
+z-index:9999;
+pointer-events:none
+}
+
+.fluid{
+position:fixed;
+inset:0;
+width:100vw;
+height:100vh;
+pointer-events:none;
+opacity:.82;
+transition:opacity .25s ease;
+filter:saturate(1.18)
+}
+
+.fluid.dimmed{
+opacity:.08
+}
+
+.cursor-core{
+position:absolute;
+top:-4px;
+left:-4px;
+width:8px;
+height:8px;
+border-radius:50%;
+opacity:0;
+will-change:transform;
+transition:
+width .18s,
+height .18s,
+top .18s,
+left .18s,
+opacity .15s
+}
+
+.cursor-core:before{
+content:"";
+position:absolute;
+inset:0;
+border-radius:50%;
+background:#fff;
+box-shadow:
+0 0 4px rgba(255,255,255,.95),
+0 0 9px rgba(131,240,255,.72),
+0 0 17px rgba(147,108,255,.55),
+0 0 27px rgba(255,73,218,.28)
+}
+
+.cursor-core i{
+position:absolute;
+inset:-7px;
+border:1px solid rgba(193,177,255,.20);
+border-radius:50%;
+animation:pulse 1.5s ease-out infinite
+}
+
+.cursor-core.interactive{
+top:-6px;
+left:-6px;
+width:12px;
+height:12px
+}
+
+.cursor-core.pressed{
+top:-3px;
+left:-3px;
+width:6px;
+height:6px
+}
+
+@keyframes pulse{
+0%{
+transform:scale(.35);
+opacity:.7
+}
+100%{
+transform:scale(1.8);
+opacity:0
+}
+}
+
+@media(pointer:fine){
+a,
+button,
+[role="button"],
+article,
+.planet,
+.project-card{
+cursor:none
+}
+}
+
+@media(pointer:coarse){
+:host{
+display:none
+}
+}
+
+@media(prefers-reduced-motion:reduce){
+:host{
+display:none
+}
+}

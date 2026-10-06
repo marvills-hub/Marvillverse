@@ -1,1 +1,32 @@
-﻿:host{display:block;background:#09090d;min-height:100vh}
+﻿:host{display:block;position:relative;background:#09090d;min-height:100vh}
+:host>app-cursor{position:fixed;inset:0;z-index:1;pointer-events:none}
+:host>app-scroll-progress,:host>app-header,:host>main,:host>app-footer{position:relative;z-index:10}
+
+/* MARVILLVERSE-HEADER-LAYER-FIX */
+:host{
+display:block;
+position:relative;
+isolation:isolate;
+background:#09090d;
+min-height:100vh;
+}
+:host>app-cursor{
+position:fixed;
+inset:0;
+z-index:1;
+pointer-events:none;
+}
+:host>main,
+:host>app-footer{
+position:relative;
+z-index:10;
+}
+:host>app-header{
+position:relative;
+z-index:10000;
+}
+:host>app-scroll-progress{
+position:relative;
+z-index:10001;
+}
+/* /MARVILLVERSE-HEADER-LAYER-FIX */

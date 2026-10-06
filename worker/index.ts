@@ -16,6 +16,7 @@ tagline:row.tagline,
 description:row.description,
 category:row.category,
 status:row.status,
+projectKind:row.project_kind||'tool',
 platforms:JSON.parse(row.platforms||'[]'),
 tech:JSON.parse(row.tech||'[]'),
 monogram:row.monogram,
@@ -28,7 +29,11 @@ featured:!!row.featured,
 vision:row.vision,
 capabilities:JSON.parse(row.capabilities||'[]'),
 github:row.github||undefined,
-website:row.website||undefined
+website:row.website||undefined,
+sourceUrl:row.source_url||undefined,
+windowsUrl:row.windows_url||undefined,
+androidUrl:row.android_url||undefined,
+iosUrl:row.ios_url||undefined
 });
 
 const authorized=(request:Request,env:Env)=>{
@@ -77,13 +82,13 @@ if(!validProject(p))return json({error:'Invalid project data'},400);
 const exists=await env.DB.prepare('SELECT id FROM projects WHERE id=?').bind(p.id).first();
 if(exists)return json({error:'Project ID already exists'},409);
 const order:any=await env.DB.prepare('SELECT COALESCE(MAX(sort_order),0)+1 AS next FROM projects').first();
-await env.DB.prepare(`INSERT INTO projects(id,name,tagline,description,category,status,platforms,tech,monogram,accent,progress,version,updated,started,featured,vision,capabilities,github,website,sort_order)
-VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(
+await env.DB.prepare(`INSERT INTO projects(id,name,tagline,description,category,status,platforms,tech,monogram,accent,progress,version,updated,started,featured,vision,capabilities,github,website,sort_order,project_kind,source_url,windows_url,android_url,ios_url)
+VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(
 p.id,p.name,p.tagline,p.description||'',p.category,p.status,
 JSON.stringify(p.platforms||[]),JSON.stringify(p.tech||[]),p.monogram||p.name[0],
 p.accent||'#735cff',Number(p.progress)||0,p.version||'0.1.0',p.updated||new Date().toISOString().slice(0,10),
 p.started||'',p.featured?1:0,p.vision||'',JSON.stringify(p.capabilities||[]),
-p.github||null,p.website||null,order?.next||1
+p.github||null,p.website||null,order?.next||1,p.projectKind||'tool',p.sourceUrl||null,p.windowsUrl||null,p.androidUrl||null,p.iosUrl||null
 ).run();
 return json({ok:true},201);
 }
@@ -94,12 +99,12 @@ if(projectMatch&&request.method==='PUT'){
 const oldId=decodeURIComponent(projectMatch[1]);
 const p:any=await request.json();
 if(!validProject(p))return json({error:'Invalid project data'},400);
-await env.DB.prepare(`UPDATE projects SET name=?,tagline=?,description=?,category=?,status=?,platforms=?,tech=?,monogram=?,accent=?,progress=?,version=?,updated=?,started=?,featured=?,vision=?,capabilities=?,github=?,website=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`).bind(
+await env.DB.prepare(`UPDATE projects SET name=?,tagline=?,description=?,category=?,status=?,platforms=?,tech=?,monogram=?,accent=?,progress=?,version=?,updated=?,started=?,featured=?,vision=?,capabilities=?,github=?,website=?,project_kind=?,source_url=?,windows_url=?,android_url=?,ios_url=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`).bind(
 p.name,p.tagline,p.description||'',p.category,p.status,
 JSON.stringify(p.platforms||[]),JSON.stringify(p.tech||[]),p.monogram||p.name[0],
 p.accent||'#735cff',Number(p.progress)||0,p.version||'0.1.0',p.updated||new Date().toISOString().slice(0,10),
 p.started||'',p.featured?1:0,p.vision||'',JSON.stringify(p.capabilities||[]),
-p.github||null,p.website||null,oldId
+p.github||null,p.website||null,p.projectKind||'tool',p.sourceUrl||null,p.windowsUrl||null,p.androidUrl||null,p.iosUrl||null,oldId
 ).run();
 return json({ok:true});
 }
@@ -129,3 +134,4 @@ if(url.pathname.startsWith('/api/'))return json({error:'Not found'},404);
 return env.ASSETS.fetch(request);
 }
 } satisfies ExportedHandler<Env>;
+

@@ -1,9 +1,27 @@
-﻿import{Component,HostListener,signal}from'@angular/core';
-@Component({selector:'app-cursor',templateUrl:'./cursor.html',styleUrl:'./cursor.scss'})
-export class Cursor{
-readonly x=signal(-200);
-readonly y=signal(-200);
-readonly active=signal(false);
-@HostListener('document:mousemove',['$event'])move(e:MouseEvent){this.x.set(e.clientX);this.y.set(e.clientY)}
-@HostListener('document:mouseover',['$event'])over(e:MouseEvent){this.active.set(!!(e.target as HTMLElement).closest('a,button,article'))}
+﻿import{AfterViewInit,Component,ElementRef,NgZone,OnDestroy,ViewChild}from'@angular/core';
+import{initFluid}from'smokey-fluid-cursor';
+@Component({
+selector:'app-cursor',
+templateUrl:'./cursor.html',
+styleUrl:'./cursor.scss'
+})
+export class Cursor implements AfterViewInit,OnDestroy{
+@ViewChild('fluidLayer',{static:true})fluidLayer!:ElementRef<HTMLDivElement>;
+private fluid:any;
+constructor(private readonly zone:NgZone){}
+ngAfterViewInit(){
+if(matchMedia('(pointer:coarse)').matches)return;
+this.zone.runOutsideAngular(()=>{
+this.fluid=initFluid({
+container:this.fluidLayer.nativeElement,
+position:'absolute',
+zIndex:0,
+pointerEvents:false
+});
+});
+}
+ngOnDestroy(){
+this.fluid?.dispose?.();
+this.fluid=undefined;
+}
 }
