@@ -27,3 +27,25 @@ animation:ecosystemMarkFloat 4s ease-in-out infinite;
 .ecosystem-mark{animation:none}
 }
 /* /MARVILLVERSE-ECOSYSTEM-EMBLEM */
+
+/* MARVILLVERSE-CORE-IMAGE */
+.core .marvillverse-core-image{
+position:relative;
+z-index:2;
+width:115px;
+height:115px;
+max-width:none;
+object-fit:contain;
+pointer-events:none;
+user-select:none;
+filter:
+drop-shadow(0 0 8px rgba(73,210,255,.45))
+drop-shadow(0 0 18px rgba(117,92,255,.45))
+drop-shadow(0 0 30px rgba(224,79,255,.25));
+animation:ecosystemCoreFloat 5s ease-in-out infinite;
+}
+@keyframes ecosystemCoreFloat{
+0%,100%{transform:translateY(0) scale(1)}
+50%{transform:translateY(-3px) scale(1.04)}
+}
+/* /MARVILLVERSE-CORE-IMAGE */

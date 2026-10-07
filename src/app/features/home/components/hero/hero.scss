@@ -694,3 +694,50 @@ animation:mvEmblemSweep 5.5s ease-in-out infinite;
 .marvillverse-emblem,.marvillverse-emblem::before,.marvillverse-emblem::after{animation:none!important}
 }
 /* /MARVILLVERSE-ICON-UPGRADE */
+
+
+
+
+
+/* HERO-MARVILLVERSE-CORE */
+.planet-core{
+overflow:visible!important;
+display:grid!important;
+place-items:center!important;
+}
+
+.planet-core .marvillverse-core-image{
+position:absolute;
+left:50%;
+top:50%;
+width:190px;
+height:190px;
+max-width:none;
+object-fit:contain;
+transform:translate(-50%,-50%);
+z-index:5;
+pointer-events:none;
+user-select:none;
+filter:
+drop-shadow(0 0 8px rgba(50,220,255,.45))
+drop-shadow(0 0 20px rgba(112,78,255,.45))
+drop-shadow(0 0 38px rgba(235,66,255,.24));
+animation:marvillverseCoreFloat 5s ease-in-out infinite;
+}
+
+@keyframes marvillverseCoreFloat{
+0%,100%{
+transform:translate(-50%,-50%) scale(1);
+}
+50%{
+transform:translate(-50%,-52%) scale(1.04);
+}
+}
+
+@media(max-width:750px){
+.planet-core .marvillverse-core-image{
+width:150px;
+height:150px;
+}
+}
+/* /HERO-MARVILLVERSE-CORE */

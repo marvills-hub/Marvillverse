@@ -1,0 +1,20 @@
+﻿*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020205;color:#fff;font-family:Arial,Helvetica,sans-serif}
+body{background:radial-gradient(circle at 50% 50%,#100c26 0,#070711 25%,#030307 58%,#010102 100%)}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(89,60,255,.13),transparent 34%),radial-gradient(circle at 45% 45%,rgba(0,205,255,.055),transparent 27%),radial-gradient(circle at 57% 55%,rgba(255,0,216,.045),transparent 25%)}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.12;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(circle at center,#000,transparent 72%)}
+#webglCanvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+#sourceIcon{position:fixed;width:1px;height:1px;opacity:0;pointer-events:none}
+.hud{position:fixed;z-index:10;pointer-events:none}
+.top{top:30px;left:34px;display:flex;flex-direction:column;gap:6px}
+.top span{font-size:8px;letter-spacing:2.8px;color:#777386}
+.top strong{font-size:15px;letter-spacing:2px}
+.top small{font-size:8px;letter-spacing:1.6px;color:#514d60}
+.bottom{right:30px;bottom:28px;display:flex;align-items:center;gap:8px;font-size:8px;letter-spacing:1.7px;color:#777284}
+.dot{width:5px;height:5px;border-radius:50%;background:#8a6dff;box-shadow:0 0 6px #8a6dff,0 0 16px #7254ff}
+.instructions{position:fixed;z-index:10;left:34px;bottom:27px;color:#4d4959;font-size:7px;line-height:1.8;letter-spacing:1.6px;pointer-events:none}
+#loader{position:fixed;z-index:30;inset:0;background:#020205;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .8s ease}
+#loader span{font-size:8px;letter-spacing:3px;color:#716b80}
+.loader-core{width:30px;height:30px;border-radius:50%;border:1px solid rgba(122,92,255,.3);box-shadow:0 0 30px rgba(102,69,255,.2);position:relative;animation:spin 1.6s linear infinite}
+.loader-core:before{content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:#9c83ff;left:50%;top:-3px;box-shadow:0 0 12px #765cff}
+@keyframes spin{to{transform:rotate(360deg)}}

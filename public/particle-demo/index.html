@@ -1,0 +1,46 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MarvillVerse Particle Core</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="hud top">
+<span>MARVILLVERSE // PARTICLE RECONSTRUCTION</span>
+<strong>COSMIC CORE</strong>
+<small>REAL ICON PARTICLE MAP</small>
+</div>
+
+<div class="hud bottom">
+<span class="dot"></span>
+<span id="state">ASSEMBLING</span>
+</div>
+
+<div class="instructions">
+MOVE CURSOR TO TILT<br>
+CLICK TO DISPERSE / REASSEMBLE
+</div>
+
+<div id="loader">
+<div class="loader-core"></div>
+<span>READING MARVILLVERSE CORE</span>
+</div>
+
+<canvas id="webglCanvas"></canvas>
+
+<img id="sourceIcon" src="./marvillverse-core.png" crossorigin="anonymous">
+
+<script type="importmap">
+{
+"imports":{
+"three":"https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+"three/addons/":"https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+}
+}
+</script>
+
+<script type="module" src="./script.js"></script>
+</body>
+</html>
