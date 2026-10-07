@@ -18,3 +18,131 @@ body:after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.12;bac
 .loader-core{width:30px;height:30px;border-radius:50%;border:1px solid rgba(122,92,255,.3);box-shadow:0 0 30px rgba(102,69,255,.2);position:relative;animation:spin 1.6s linear infinite}
 .loader-core:before{content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:#9c83ff;left:50%;top:-3px;box-shadow:0 0 12px #765cff}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* MARVILLVERSE-EMBED-MODE */
+html.embed,
+html.embed body{
+background:transparent!important;
+}
+
+html.embed .hud,
+html.embed .instructions,
+html.embed #loader{
+display:none!important;
+}
+
+html.embed #webglCanvas{
+position:fixed;
+inset:0;
+width:100%!important;
+height:100%!important;
+display:block;
+}
+/* /MARVILLVERSE-EMBED-MODE */
+
+/* MARVILLVERSE-HERO-TRANSPARENT */
+html.embed,
+html.embed body{
+margin:0!important;
+padding:0!important;
+width:100%!important;
+height:100%!important;
+overflow:hidden!important;
+background:transparent!important;
+background-color:transparent!important;
+background-image:none!important;
+}
+
+html.embed canvas,
+html.embed #webglCanvas{
+background:transparent!important;
+}
+
+html.embed .hud,
+html.embed .instructions,
+html.embed #loader{
+display:none!important;
+}
+/* /MARVILLVERSE-HERO-TRANSPARENT */
+
+/* MARVILLVERSE-HERO-ALPHA-V2 */
+html.mv-hero-embed,
+html.mv-hero-embed body{
+background:transparent!important;
+background-color:transparent!important;
+background-image:none!important;
+box-shadow:none!important;
+}
+
+html.mv-hero-embed body::before,
+html.mv-hero-embed body::after{
+display:none!important;
+content:none!important;
+}
+
+html.mv-hero-embed canvas{
+background:transparent!important;
+background-color:transparent!important;
+background-image:none!important;
+}
+
+html.mv-hero-embed .hud,
+html.mv-hero-embed .instructions,
+html.mv-hero-embed .loader,
+html.mv-hero-embed #loader{
+display:none!important;
+}
+/* /MARVILLVERSE-HERO-ALPHA-V2 */
+
+/* MARVILLVERSE-EMBED-TRANSPARENT-FINAL */
+html.mv-hero-embed,
+html.mv-hero-embed body,
+html.mv-hero-embed main,
+html.mv-hero-embed #app,
+html.mv-hero-embed #scene,
+html.mv-hero-embed #container{
+background:none!important;
+background-color:transparent!important;
+background-image:none!important;
+box-shadow:none!important;
+}
+
+html.mv-hero-embed,
+html.mv-hero-embed body{
+margin:0!important;
+width:100%!important;
+height:100%!important;
+overflow:hidden!important;
+}
+
+html.mv-hero-embed canvas{
+background:none!important;
+background-color:transparent!important;
+background-image:none!important;
+}
+/* /MARVILLVERSE-EMBED-TRANSPARENT-FINAL */
+
+/* MARVILLVERSE-BLACK-CANVAS-REMOVAL */
+html.mv-hero-embed,
+html.mv-hero-embed body{
+background:transparent!important;
+background-color:transparent!important;
+background-image:none!important;
+}
+
+html.mv-hero-embed canvas,
+html.mv-hero-embed #webglCanvas{
+background:transparent!important;
+background-color:transparent!important;
+background-image:none!important;
+}
+/* /MARVILLVERSE-BLACK-CANVAS-REMOVAL */
+
+/* MARVILLVERSE TRUE EMBED TRANSPARENCY */
+html:has(body) body:has(#webglCanvas){
+    background:transparent!important;
+}
+#webglCanvas{
+    background:transparent!important;
+}
+/* /MARVILLVERSE TRUE EMBED TRANSPARENCY */

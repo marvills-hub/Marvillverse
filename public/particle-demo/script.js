@@ -9,7 +9,13 @@ const source=document.getElementById('sourceIcon');
 const loader=document.getElementById('loader');
 const state=document.getElementById('state');
 
+
+const MARVILLVERSE_EMBED=
+    new URLSearchParams(window.location.search).get('embed')==='1';
 const scene=new THREE.Scene();
+if(MARVILLVERSE_EMBED){
+    scene.background=null;
+}
 scene.fog=new THREE.FogExp2(0x020205,.016);
 
 const camera=new THREE.PerspectiveCamera(46,innerWidth/innerHeight,.005,500
@@ -17,12 +23,17 @@ const camera=new THREE.PerspectiveCamera(46,innerWidth/innerHeight,.005,500
 
 camera.position.set(0,2,32);
 
-const renderer=new THREE.WebGLRenderer({
-    canvas,
+const renderer=new THREE.WebGLRenderer({canvas,alpha:true,
     antialias:true,
-    alpha:true,
-    powerPreference:'high-performance'
-});
+    powerPreference:'high-performance'});
+
+if(MARVILLVERSE_EMBED){
+    scene.background=null;
+    renderer.setClearColor(0x000000,0);
+    renderer.setClearAlpha(0);
+    renderer.autoClear=true;
+}
+
 
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));
@@ -821,6 +832,11 @@ function createOrbit(
 
     return orbit;
 }
+
+/* =========================================================
+   MARVILLVERSE DEEP GALACTIC BACKGROUND
+   ========================================================= */
+
 function createOrbits(){
     /*
      * NINE MARVILLVERSE ORBITS
@@ -837,55 +853,55 @@ function createOrbits(){
             radius:6.6,
             thickness:.15,
             count:8500,
-            color:0xffd84d
+            color:0xffe8a3
         },
         {
             radius:8.575,
             thickness:.145,
             count:8200,
-            color:0xff9f1c
+            color:0xffe8a3
         },
         {
             radius:10.485,
             thickness:.14,
             count:7900,
-            color:0xff493d
+            color:0xffe8a3
         },
         {
             radius:12.524,
             thickness:.135,
             count:7600,
-            color:0xff3dbb
+            color:0xffe8a3
         },
         {
             radius:14.693,
             thickness:.13,
             count:7300,
-            color:0xb95cff
+            color:0xffe8a3
         },
         {
             radius:16.97,
             thickness:.125,
             count:7000,
-            color:0xc8ff45
+            color:0xffe8a3
         },
         {
             radius:19.203,
             thickness:.12,
             count:6700,
-            color:0x36f59a
+            color:0xffe8a3
         },
         {
             radius:21.264,
             thickness:.115,
             count:6400,
-            color:0x28e0b8
+            color:0xffe8a3
         },
         {
             radius:23.863,
             thickness:.11,
             count:6100,
-            color:0xff7a9e
+            color:0xffe8a3
         }
     ];
 
@@ -1345,11 +1361,6 @@ function createMarvillPlanet(
      * Y remains exactly zero.
      */
 
-    group.position.set(
-        Math.cos(angle)*orbitRadius,
-        0,
-        Math.sin(angle)*orbitRadius
-    );
 
     /*
      * Add to orbitGroup.
@@ -1378,12 +1389,34 @@ function createMarvillPlanet(
      *
      * No visual child displacement is used.
      */
-    group.position.set(
-        Math.cos(angle)*orbitRadius,
-        0,
-        Math.sin(angle)*orbitRadius
-    );
 
+
+    const planetIndex=
+    orbitGroup.children.filter(
+        child=>child.userData?.isMarvillPlanet
+    ).length;
+
+const planetHeightDirections=[
+     .30,
+    -.26,
+     .34,
+    -.30,
+     .27,
+    -.33,
+     .31,
+    -.28,
+     .35
+];
+
+const planetHeight=
+    orbitRadius*
+    (planetHeightDirections[planetIndex]??.30);
+
+group.position.set(
+    Math.cos(angle)*orbitRadius,
+    planetHeight,
+    Math.sin(angle)*orbitRadius
+);
     group.userData.angle=angle;
     group.userData.radius=orbitRadius;
 
@@ -1645,89 +1678,256 @@ function createParticleStar(y,scale){
 ================================================== */
 
 function createStars(){
-    const count=5000;
+    const group=new THREE.Group();
+    group.name='deep-galactic-background';
 
-    const positions=
-        new Float32Array(
-            count*3
+    function makeStars(count,rMin,rMax,size,opacity){
+        const positions=new Float32Array(count*3);
+        const colors=new Float32Array(count*3);
+
+        for(let i=0;i<count;i++){
+            const i3=i*3;
+            const r=rMin+Math.random()*(rMax-rMin);
+            const theta=Math.random()*Math.PI*2;
+            const u=Math.random()*2-1;
+            const f=Math.sqrt(1-u*u);
+
+            positions[i3]=r*f*Math.cos(theta);
+            positions[i3+1]=r*u;
+            positions[i3+2]=r*f*Math.sin(theta);
+
+            const type=Math.random();
+            const brightness=.55+Math.random()*.45;
+
+            let cr=1;
+            let cg=1;
+            let cb=1;
+
+            if(type<.58){
+                cr=.72;
+                cg=.84;
+                cb=1;
+            }else if(type<.76){
+                cr=1;
+                cg=1;
+                cb=1;
+            }else if(type<.87){
+                cr=.55;
+                cg=.72;
+                cb=1;
+            }else if(type<.95){
+                cr=.72;
+                cg=.52;
+                cb=1;
+            }else{
+                cr=1;
+                cg=.76;
+                cb=.52;
+            }
+
+            colors[i3]=cr*brightness;
+            colors[i3+1]=cg*brightness;
+            colors[i3+2]=cb*brightness;
+        }
+
+        const geometry=new THREE.BufferGeometry();
+
+        geometry.setAttribute(
+            'position',
+            new THREE.BufferAttribute(positions,3)
         );
 
-    const colors=
-        new Float32Array(
-            count*3
+        geometry.setAttribute(
+            'color',
+            new THREE.BufferAttribute(colors,3)
         );
 
-    for(let i=0;i<count;i++){
-        const i3=i*3;
-
-        const r=
-            50+
-            Math.random()*130;
-
-        const theta=
-            Math.random()*
-            Math.PI*2;
-
-        const u=
-            Math.random()*2-1;
-
-        const f=
-            Math.sqrt(1-u*u);
-
-        positions[i3]=
-            r*f*
-            Math.cos(theta);
-
-        positions[i3+1]=
-            r*u;
-
-        positions[i3+2]=
-            r*f*
-            Math.sin(theta);
-
-        const b=
-            .25+
-            Math.random()*.45;
-
-        colors[i3]=b*.65;
-        colors[i3+1]=b*.7;
-        colors[i3+2]=b;
-    }
-
-    const geometry=
-        new THREE.BufferGeometry();
-
-    geometry.setAttribute(
-        'position',
-        new THREE.BufferAttribute(
-            positions,3
-        )
-    );
-
-    geometry.setAttribute(
-        'color',
-        new THREE.BufferAttribute(
-            colors,3
-        )
-    );
-
-    const stars=
-        new THREE.Points(
+        const points=new THREE.Points(
             geometry,
             new THREE.PointsMaterial({
-                size:.055,
+                size,
+                sizeAttenuation:false,
                 vertexColors:true,
                 transparent:true,
-                opacity:.6,
-                depthWrite:false
+                opacity,
+                depthWrite:false,
+                depthTest:true,
+                blending:THREE.AdditiveBlending,
+                fog:false
             })
         );
 
-    stars.name='stars';
+        group.add(points);
+    }
 
-    scene.add(stars);
+    function makeNebula(
+        count,
+        radius,
+        width,
+        height,
+        depth,
+        color,
+        opacity,
+        rotation
+    ){
+        const positions=new Float32Array(count*3);
+        const colors=new Float32Array(count*3);
+        const base=new THREE.Color(color);
+
+        for(let i=0;i<count;i++){
+            const i3=i*3;
+
+            /*
+             * Gaussian-style distribution creates cloudy
+             * concentrations rather than a uniform sphere.
+             */
+            const a=
+                Math.random()+
+                Math.random()+
+                Math.random()+
+                Math.random()-2;
+
+            const b=
+                Math.random()+
+                Math.random()+
+                Math.random()+
+                Math.random()-2;
+
+            const c=
+                Math.random()+
+                Math.random()+
+                Math.random()+
+                Math.random()-2;
+
+            positions[i3]=a*width;
+            positions[i3+1]=b*height;
+            positions[i3+2]=c*depth-radius;
+
+            const glow=.20+Math.random()*.80;
+
+            colors[i3]=base.r*glow;
+            colors[i3+1]=base.g*glow;
+            colors[i3+2]=base.b*glow;
+        }
+
+        const geometry=new THREE.BufferGeometry();
+
+        geometry.setAttribute(
+            'position',
+            new THREE.BufferAttribute(positions,3)
+        );
+
+        geometry.setAttribute(
+            'color',
+            new THREE.BufferAttribute(colors,3)
+        );
+
+        const cloud=new THREE.Points(
+            geometry,
+            new THREE.PointsMaterial({
+                size:2.2,
+                sizeAttenuation:false,
+                vertexColors:true,
+                transparent:true,
+                opacity,
+                depthWrite:false,
+                depthTest:true,
+                blending:THREE.AdditiveBlending,
+                fog:false
+            })
+        );
+
+        cloud.rotation.z=rotation;
+        group.add(cloud);
+    }
+
+    /*
+     * Three stellar depth layers.
+     *
+     * sizeAttenuation:false is intentional:
+     * these remain visible even though they represent
+     * extremely distant stars.
+     */
+    makeStars(
+        6500,
+        65,
+        105,
+        .75,
+        .62
+    );
+
+    makeStars(
+        4200,
+        105,
+        160,
+        1.05,
+        .76
+    );
+
+    makeStars(
+        1200,
+        80,
+        150,
+        1.65,
+        .90
+    );
+
+    /*
+     * Broad particle nebulae.
+     *
+     * They sit primarily behind the universe and create
+     * the blue / violet / cyan galactic-cloud appearance.
+     */
+    makeNebula(
+        3800,
+        115,
+        55,
+        20,
+        8,
+        0x294cff,
+        .11,
+        -.22
+    );
+
+    makeNebula(
+        3000,
+        120,
+        42,
+        16,
+        7,
+        0x793cff,
+        .105,
+        .35
+    );
+
+    makeNebula(
+        2600,
+        125,
+        34,
+        14,
+        6,
+        0x00bfff,
+        .085,
+        -.48
+    );
+
+    makeNebula(
+        1900,
+        130,
+        28,
+        12,
+        5,
+        0xd43cff,
+        .065,
+        .68
+    );
+
+    /*
+     * The entire background remains static.
+     * Camera movement provides natural depth/parallax.
+     */
+    scene.add(group);
 }
-
 /* ==================================================
    ANIMATION
 ================================================== */
@@ -1939,19 +2139,36 @@ function focusPlanet(planet){
     );
 }
 function returnToUniverse(){
-    /*
-     * Everything remains visible.
-     */
     setOrbitVisibility(true);
     setPlanetVisibility(null);
 
     planetFocus.planet=null;
+    planetFocus.active=true;
+    planetFocus.progress=0;
 
-    beginPlanetFocus(
-        planetFocus.homeTarget,
-        null,
-        true
+    /*
+     * Start from wherever the camera currently is.
+     */
+    planetFocus.startCamera.copy(
+        camera.position
     );
+
+    planetFocus.startTarget.copy(
+        controls.target
+    );
+
+    /*
+     * Return to the EXACT startup camera + target.
+     */
+    planetFocus.targetCamera.copy(
+        planetFocus.homeCamera
+    );
+
+    planetFocus.targetTarget.copy(
+        planetFocus.homeTarget
+    );
+
+    planetFocusClock.getDelta();
 }
 function updatePlanetFocus(delta){
     if(!planetFocus.active)
@@ -2152,18 +2369,18 @@ function pickPlanet(event){
      * PLANET CLICK
      */
     if(selectedPlanet){
-        focusPlanet(
-            selectedPlanet
-        );
+        focusPlanet(selectedPlanet);
 
         return;
     }
 
-    /*
-     * REAL EMPTY-SPACE CLICK
-     */
+    /* Empty canvas -> exact rendered startup view. */
     returnToUniverse();
 }
+renderer.domElement.addEventListener(
+    'click',
+    pickPlanet
+);
 renderer.domElement.addEventListener(
     'pointerdown',
     event=>{
@@ -2230,11 +2447,610 @@ renderer.domElement.addEventListener(
     }
 );
 
-renderer.domElement.addEventListener(
-    'click',
-    pickPlanet
-);
+/* MV-ASSEMBLY-ENTRANCE-START */
+const mvAssembly={
+active:true,
+started:performance.now(),
+duration:3000,
+objects:[],
+finished:false
+};
+
+const mvEaseOutCubic=t=>1-Math.pow(1-t,3);
+const mvEaseInOutCubic=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+
+function mvAssemblyRegister(object,delay=0,duration=1,spread=1){
+    if(!object)return;
+
+    const finalPosition=object.position.clone();
+    const finalScale=object.scale.clone();
+
+    const direction=new THREE.Vector3(
+        Math.random()*2-1,
+        Math.random()*2-1,
+        Math.random()*2-1
+    ).normalize();
+
+    const distance=(16+Math.random()*34)*spread;
+
+    const scatteredPosition=finalPosition.clone().add(
+        direction.multiplyScalar(distance)
+    );
+
+    scatteredPosition.y+=(Math.random()-.5)*18*spread;
+
+    mvAssembly.objects.push({
+        object,
+        finalPosition,
+        finalScale,
+        scatteredPosition,
+        delay,
+        duration,
+        startRotation:object.rotation.clone(),
+        spin:new THREE.Vector3(
+            (Math.random()-.5)*3,
+            (Math.random()-.5)*3,
+            (Math.random()-.5)*3
+        )
+    });
+
+    object.position.copy(scatteredPosition);
+    object.scale.setScalar(.001);
+}
+
+const mvPlanetFormation={
+    active:true,
+    clouds:[]
+};
+
+function mvCreatePlanetDustFormation(planet,index){
+    const finalScale=planet.scale.clone();
+    const finalPosition=planet.position.clone();
+
+    /*
+     * Planet stays at its real orbit position.
+     * Only its dust moves.
+     */
+    planet.position.copy(finalPosition);
+    planet.scale.setScalar(.001);
+
+    const count=180;
+    const positions=new Float32Array(count*3);
+    const startPositions=new Float32Array(count*3);
+    const phases=new Float32Array(count);
+    const radii=new Float32Array(count);
+    const heights=new Float32Array(count);
+
+    const planetRadius=
+        planet.userData.planetRadius||
+        .7;
+
+    for(let i=0;i<count;i++){
+        const phase=Math.random()*Math.PI*2;
+
+        /*
+         * Local dust cloud around THIS planet only.
+         */
+        const radius=
+            planetRadius*
+            (2.7+Math.random()*4.8);
+
+        const height=
+            (Math.random()-.5)*
+            planetRadius*
+            5.2;
+
+        const x=Math.cos(phase)*radius;
+        const y=height;
+        const z=Math.sin(phase)*radius;
+
+        const p=i*3;
+
+        positions[p]=x;
+        positions[p+1]=y;
+        positions[p+2]=z;
+
+        startPositions[p]=x;
+        startPositions[p+1]=y;
+        startPositions[p+2]=z;
+
+        phases[i]=phase;
+        radii[i]=radius;
+        heights[i]=height;
+    }
+
+    const geometry=new THREE.BufferGeometry();
+
+    geometry.setAttribute(
+        'position',
+        new THREE.BufferAttribute(
+            positions,
+            3
+        )
+    );
+
+    /*
+     * Reuse the planet's actual visual color when available.
+     */
+    let dustColor=new THREE.Color(0xffffff);
+
+    planet.traverse(child=>{
+        if(
+            child.material &&
+            child.material.color
+        ){
+            dustColor.copy(
+                child.material.color
+            );
+        }
+    });
+
+    const material=new THREE.PointsMaterial({
+        color:dustColor,
+        size:Math.max(
+            .025,
+            planetRadius*.065
+        ),
+        transparent:true,
+        opacity:0,
+        depthWrite:false,
+        blending:THREE.AdditiveBlending,
+        sizeAttenuation:true
+    });
+
+    const dust=new THREE.Points(
+        geometry,
+        material
+    );
+
+    /*
+     * Dust system is attached to orbitGroup so its origin
+     * is exactly the planet's final local orbital position.
+     */
+    dust.position.copy(finalPosition);
+    orbitGroup.add(dust);
+
+    const delay=
+        .28+
+        index*.045;
+
+    mvPlanetFormation.clouds.push({
+        planet,
+        dust,
+        geometry,
+        material,
+        positions,
+        startPositions,
+        phases,
+        radii,
+        heights,
+        finalScale,
+        planetRadius,
+        delay,
+        duration:.46+index*.006,
+        spinDirection:index%2===0?1:-1
+    });
+}
+
+function mvPreparePlanetDustFormation(){
+    const mvPlanets=getMarvillPlanets();
+
+    mvPlanets.forEach(
+        (planet,index)=>{
+            mvCreatePlanetDustFormation(
+                planet,
+                index
+            );
+        }
+    );
+}
+
+function mvUpdatePlanetDustFormation(master){
+    if(!mvPlanetFormation.active)return;
+
+    let completed=0;
+
+    for(const cloud of mvPlanetFormation.clouds){
+        const local=Math.min(
+            1,
+            Math.max(
+                0,
+                (master-cloud.delay)/
+                cloud.duration
+            )
+        );
+
+        if(local<=0){
+            cloud.material.opacity=0;
+            continue;
+        }
+
+        /*
+         * Dust appears quickly, then fades as it becomes
+         * solid matter.
+         */
+        const appear=Math.min(
+            1,
+            local/.12
+        );
+
+        const disappear=
+            local<.68
+            ?1
+            :1-(local-.68)/.32;
+
+        cloud.material.opacity=
+            Math.max(
+                0,
+                appear*disappear*.92
+            );
+
+        /*
+         * Collapse curve:
+         * slow swirling at first,
+         * increasingly strong inward condensation.
+         */
+        const collapse=
+            local*local*
+            (3-2*local);
+
+        const remaining=
+            1-collapse;
+
+        const positions=cloud.positions;
+
+        for(
+            let i=0;
+            i<cloud.phases.length;
+            i++
+        ){
+            const p=i*3;
+
+            /*
+             * Multiple rotations happen locally around the
+             * future planet position.
+             */
+            const rotations=
+                3.6+
+                (i%7)*.13;
+
+            const angle=
+                cloud.phases[i]+
+                cloud.spinDirection*
+                local*
+                Math.PI*2*
+                rotations;
+
+            /*
+             * Spiral radius collapses toward the center.
+             */
+            const radius=
+                cloud.radii[i]*
+                (
+                    .04+
+                    remaining*.96
+                );
+
+            /*
+             * Vertical dust also collapses toward the
+             * planet's equatorial region.
+             */
+            const vertical=
+                cloud.heights[i]*
+                remaining+
+                Math.sin(
+                    angle*1.7+
+                    i*.31
+                )*
+                cloud.planetRadius*
+                .16*
+                remaining;
+
+            /*
+             * Slight turbulent breathing prevents the cloud
+             * from looking like a perfect mechanical ring.
+             */
+            const turbulence=
+                Math.sin(
+                    local*Math.PI+
+                    i*.73
+                )*
+                cloud.planetRadius*
+                .18*
+                remaining;
+
+            positions[p]=
+                Math.cos(angle)*
+                radius+
+                turbulence;
+
+            positions[p+1]=
+                vertical;
+
+            positions[p+2]=
+                Math.sin(angle)*
+                radius+
+                Math.cos(
+                    angle*.7+i
+                )*
+                cloud.planetRadius*
+                .1*
+                remaining;
+        }
+
+        cloud.geometry
+            .attributes
+            .position
+            .needsUpdate=true;
+
+        /*
+         * Actual planet only becomes visible during the
+         * final condensation phase.
+         */
+        const solidStart=.58;
+
+        const solid=
+            local<=solidStart
+            ?0
+            :Math.min(
+                1,
+                (local-solidStart)/
+                (1-solidStart)
+            );
+
+        const solidEase=
+            1-Math.pow(
+                1-solid,
+                3
+            );
+
+        cloud.planet.scale.set(
+            cloud.finalScale.x*solidEase,
+            cloud.finalScale.y*solidEase,
+            cloud.finalScale.z*solidEase
+        );
+
+        if(local>=1){
+            cloud.planet.scale.copy(
+                cloud.finalScale
+            );
+
+            cloud.dust.visible=false;
+            completed++;
+        }
+    }
+
+    if(
+        completed===
+        mvPlanetFormation.clouds.length &&
+        mvPlanetFormation.clouds.length
+    ){
+        mvFinishPlanetDustFormation();
+    }
+}
+
+function mvFinishPlanetDustFormation(){
+    if(!mvPlanetFormation.active)return;
+
+    mvPlanetFormation.active=false;
+
+    for(const cloud of mvPlanetFormation.clouds){
+        cloud.planet.scale.copy(
+            cloud.finalScale
+        );
+
+        orbitGroup.remove(
+            cloud.dust
+        );
+
+        cloud.geometry.dispose();
+        cloud.material.dispose();
+    }
+
+    mvPlanetFormation.clouds.length=0;
+}
+function mvPrepareAssemblyEntrance(){
+    /*
+     * Core begins as a tiny scattered structure.
+     */
+    mvAssemblyRegister(
+        coreGroup,
+        0,
+        .58,
+        .38
+    );
+
+    /*
+     * Orbit rings arrive after the core starts condensing.
+     * Register individual rings so they assemble progressively
+     * rather than the complete orbit system popping in.
+     */
+    const orbitChildren=orbitGroup.children.filter(
+        child=>child.isPoints
+    );
+
+    orbitChildren.forEach((object,index)=>{
+        mvAssemblyRegister(
+            object,
+            .18+index*.035,
+            .54,
+            .32+index*.025
+        );
+    });
+
+    /* Planets use local rotating dust formation. */
+    mvPreparePlanetDustFormation();
+
+    /*
+     * Decorative particle stars ignite last.
+     */
+    const decorationChildren=[...decorationGroup.children];
+
+    decorationChildren.forEach((object,index)=>{
+        mvAssemblyRegister(
+            object,
+            .68+index*.07,
+            .28,
+            .55
+        );
+    });
+}
+
+function mvUpdateAssemblyEntrance(now){
+    if(!mvAssembly.active)return;
+
+    const elapsed=now-mvAssembly.started;
+    const master=Math.min(1,elapsed/mvAssembly.duration);
+
+    for(const item of mvAssembly.objects){
+        const available=Math.max(
+            .0001,
+            1-item.delay
+        );
+
+        const local=Math.min(
+            1,
+            Math.max(
+                0,
+                (master-item.delay)/
+                (available*item.duration)
+            )
+        );
+
+        const eased=mvEaseInOutCubic(local);
+
+        /*
+         * Curved inward travel gives the particles/objects
+         * a vortex-like assembly instead of straight lines.
+         */
+        const arc=Math.sin(local*Math.PI)*(1-local);
+
+        item.object.position.lerpVectors(
+            item.scatteredPosition,
+            item.finalPosition,
+            eased
+        );
+
+        if(local>0&&local<1){
+            item.object.position.x+=
+                Math.sin(
+                    local*Math.PI*2+
+                    item.delay*12
+                )*
+                arc*
+                2.2;
+
+            item.object.position.y+=
+                Math.cos(
+                    local*Math.PI*2+
+                    item.delay*9
+                )*
+                arc*
+                1.25;
+        }
+
+        /*
+         * Condensation:
+         * objects begin almost invisible in size and expand
+         * naturally into their exact original scale.
+         */
+        const scaleEase=mvEaseOutCubic(
+            Math.min(
+                1,
+                Math.max(
+                    0,
+                    local*1.16
+                )
+            )
+        );
+
+        item.object.scale.set(
+            item.finalScale.x*scaleEase,
+            item.finalScale.y*scaleEase,
+            item.finalScale.z*scaleEase
+        );
+
+        /*
+         * Small rotational turbulence while assembling.
+         */
+        const turbulence=(1-eased)*Math.sin(local*Math.PI);
+
+        item.object.rotation.x=
+            item.startRotation.x+
+            item.spin.x*turbulence;
+
+        item.object.rotation.y=
+            item.startRotation.y+
+            item.spin.y*turbulence;
+
+        item.object.rotation.z=
+            item.startRotation.z+
+            item.spin.z*turbulence;
+    }
+
+    if(master>=1){
+        mvFinishAssemblyEntrance();
+    }
+}
+
+function mvFinishAssemblyEntrance(){
+    if(mvAssembly.finished)return;
+
+    mvAssembly.finished=true;
+    mvAssembly.active=false;
+
+    /*
+     * Snap everything to the EXACT pre-animation state.
+     * This guarantees the entrance cannot permanently alter
+     * the approved MarvillVerse layout.
+     */
+    for(const item of mvAssembly.objects){
+        item.object.position.copy(
+            item.finalPosition
+        );
+
+        item.object.scale.copy(
+            item.finalScale
+        );
+
+        item.object.rotation.copy(
+            item.startRotation
+        );
+    }
+
+    mvAssembly.objects.length=0;
+}
+/* MV-ASSEMBLY-ENTRANCE-END */
 function animate(){
+    mvUpdateAssemblyEntrance(performance.now());
+
+    if(mvAssembly.active){
+        const mvEntranceMaster=Math.min(
+            1,
+            (
+                performance.now()-
+                mvAssembly.started
+            )/
+            mvAssembly.duration
+        );
+
+        mvUpdatePlanetDustFormation(
+            mvEntranceMaster
+        );
+    }
+    /* immersive automatic camera update disabled */
+    /*
+     * Intentionally almost motionless so the stars feel
+     * extremely far from the MarvillVerse system.
+     */
+
+
+    /*
+     * Intentionally almost motionless so the stars feel
+     * extremely far from the MarvillVerse system.
+     */
+
+
     /*
      * Planet camera focus transition.
      */
@@ -2331,14 +3147,22 @@ function animate(){
     decorationGroup.position.y=
         coreGroup.position.y;
 
+    if(MARVILLVERSE_EMBED){
+    scene.background=null;
+    renderer.setClearColor(0x000000,0);
+    renderer.setClearAlpha(0);
+    renderer.clear(true,true,true);
+    renderer.render(scene,camera);
+}else{
     composer.render();
+}
 }
 
 /* ==================================================
    BUILD
 ================================================== */
 
-createStars();
+if(!MARVILLVERSE_EMBED)createStars();
 
 createGalaxySphere();
 
@@ -2363,25 +3187,79 @@ for(const child of [...orbitGroup.children]){
     }
 }
 
-/*
- * CLEAN LEGACY PLANETS
- *
- * At this point the nine orbit rings already exist.
- * Preserve THREE.Points orbit rings, but remove legacy
- * THREE.Group planet objects previously attached to
- * orbitGroup.
- *
- * The new nine Marvill planets are created immediately
- * afterward.
- */
+createMarvillPlanets();
 
-for(const child of [...orbitGroup.children]){
-    if(child.isGroup){
-        orbitGroup.remove(child);
+/* MARVILLVERSE_EMBED_CAMERA */
+if(MARVILLVERSE_EMBED){
+    camera.position.set(-26,26,-48.2);
+    camera.lookAt(0,0,0);
+
+    if(typeof controls!=='undefined'&&controls){
+        controls.target.set(0,0,0);
+        controls.update();
     }
 }
+/* /MARVILLVERSE_EMBED_CAMERA */
 
-createMarvillPlanets();
+/* MV-V4-BRIDGE-START */
+let MV_UNIVERSE_IMMERSIVE=false;
+
+if(MARVILLVERSE_EMBED){
+
+canvas.addEventListener('dblclick',event=>{
+event.preventDefault();
+event.stopPropagation();
+
+window.parent.postMessage(
+{type:'MV_UNIVERSE_DBLCLICK'},
+location.origin
+);
+});
+
+window.addEventListener('message',event=>{
+if(event.origin!==location.origin)return;
+
+const message=event.data;
+
+if(!message||message.type!=='MV_UNIVERSE_STATE')return;
+
+MV_UNIVERSE_IMMERSIVE=message.immersive===true;
+
+if(MV_UNIVERSE_IMMERSIVE){
+
+/*
+ * Fullscreen mode:
+ * restore the particle demo's own dark space environment.
+ */
+scene.background=new THREE.Color(0x020205);
+
+renderer.setClearColor(
+0x020205,
+1
+);
+
+renderer.setClearAlpha(1);
+
+}else{
+
+/*
+ * Hero mode:
+ * return to the approved transparent embed.
+ */
+scene.background=null;
+
+renderer.setClearColor(
+0x000000,
+0
+);
+
+renderer.setClearAlpha(0);
+
+}
+
+});
+}
+/* MV-V4-BRIDGE-END */
 
 
 createParticleStar(
@@ -2426,48 +3304,14 @@ window.addEventListener(
     }
 );
 
+mvPrepareAssemblyEntrance();
+/* MV-HOME-CAMERA-CAPTURE */
+planetFocus.homeCamera.copy(
+    camera.position
+);
+
+planetFocus.homeTarget.copy(
+    controls.target
+);
 animate();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -5,6 +5,33 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MarvillVerse Particle Core</title>
 <link rel="stylesheet" href="./style.css">
+<script>
+if(new URLSearchParams(location.search).get('embed')==='1'){
+document.documentElement.classList.add('embed');
+}
+</script>
+<script>
+if(new URLSearchParams(location.search).get('embed')==='1'){
+document.documentElement.classList.add('mv-hero-embed');
+document.addEventListener('DOMContentLoaded',()=>{
+document.body.classList.add('mv-hero-embed');
+});
+}
+</script>
+<!-- MARVILLVERSE_EMBED_DOCUMENT -->
+<!-- MARVILLVERSE EMBED ALPHA -->
+<script>
+if(new URLSearchParams(location.search).get('embed')==='1'){
+    document.documentElement.style.background='transparent';
+    document.addEventListener('DOMContentLoaded',()=>{
+        document.documentElement.style.background='transparent';
+        document.body.style.background='transparent';
+        const canvas=document.getElementById('webglCanvas');
+        if(canvas)canvas.style.background='transparent';
+    });
+}
+</script>
+<!-- /MARVILLVERSE EMBED ALPHA -->
 </head>
 <body>
 <div class="hud top">
@@ -44,3 +71,4 @@ CLICK TO DISPERSE / REASSEMBLE
 <script type="module" src="./script.js"></script>
 </body>
 </html>
+

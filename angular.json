@@ -54,7 +54,15 @@
                                                                                                      ],
                                                                                           "styles":  [
                                                                                                          "src/styles.scss"
-                                                                                                     ]
+                                                                                                     ],
+                                                                                          "optimization":  {
+                                                                                                               "scripts":  true,
+                                                                                                               "styles":  {
+                                                                                                                              "minify":  true,
+                                                                                                                              "inlineCritical":  true
+                                                                                                                          },
+                                                                                                               "fonts":  false
+                                                                                                           }
                                                                                       },
                                                                           "configurations":  {
                                                                                                  "production":  {

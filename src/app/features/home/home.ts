@@ -11,10 +11,12 @@ import{ActivityStream}from'./components/activity-stream/activity-stream';
 import{CommonProjects}from'./components/common-projects/common-projects';
 import{Ecosystem}from'./components/ecosystem/ecosystem';
 import{About}from'./components/about/about';
+import{GalaxyBackground}from'../../shared/components/galaxy-background/galaxy-background';
 @Component({
 selector:'app-home',
-imports:[Header,Footer,Cursor,ScrollProgress,Hero,Projects,Marquee,Telemetry,CommonProjects,ActivityStream,Ecosystem,About],
+imports:[GalaxyBackground,Header,Footer,Cursor,ScrollProgress,Hero,Projects,Marquee,Telemetry,CommonProjects,ActivityStream,Ecosystem,About],
 templateUrl:'./home.html',
 styleUrl:'./home.scss'
 })
 export class Home{}
+

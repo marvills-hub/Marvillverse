@@ -1,4 +1,4 @@
-﻿import{Component,computed,ElementRef,inject,signal}from'@angular/core';
+﻿import{Component,computed,ElementRef,inject,signal,HostListener}from'@angular/core';
 import{Project}from'../../../../core/models/project';
 import{ProjectsService}from'../../../../core/services/projects.service';
 import{SoftwareModal}from'../../../../shared/components/software-modal/software-modal';
@@ -10,6 +10,10 @@ templateUrl:'./hero.html',
 styleUrl:'./hero.scss'
 })
 export class Hero{
+constructor(){
+document.documentElement.classList.remove('mv-universe-immersive');
+document.body.classList.remove('mv-universe-immersive');
+}
 private readonly service=inject(ProjectsService);
 private readonly host=inject(ElementRef<HTMLElement>);
 private lastTitleX=0;
@@ -20,7 +24,36 @@ readonly selected=signal<Project|null>(null);
 readonly projects=computed(()=>this.service.projects().filter(p=>p.projectKind==='tool'));
 readonly projectCount=computed(()=>this.projects().length);
 readonly universeTransform=signal('translate3d(0,0,0)');
+readonly universeImmersive=signal(false);
+private universeScrollY=0;
 open(project:Project){this.selected.set(project)}
+
+toggleUniverse(event?:MouseEvent){
+event?.preventDefault();
+event?.stopPropagation();
+
+const entering=!this.universeImmersive();
+
+if(entering){
+this.universeScrollY=window.scrollY;
+this.universeImmersive.set(true);
+document.documentElement.classList.add('mv-universe-immersive');
+document.body.classList.add('mv-universe-immersive');
+requestAnimationFrame(()=>{
+const frame=this.host.nativeElement.querySelector('.universe-frame') as HTMLIFrameElement|null;
+frame?.contentWindow?.postMessage({type:'marvillverse-universe-mode',immersive:true},location.origin);
+});
+}else{
+const frame=this.host.nativeElement.querySelector('.universe-frame') as HTMLIFrameElement|null;
+frame?.contentWindow?.postMessage({type:'marvillverse-universe-mode',immersive:false},location.origin);
+this.universeImmersive.set(false);
+document.documentElement.classList.remove('mv-universe-immersive');
+document.body.classList.remove('mv-universe-immersive');
+requestAnimationFrame(()=>{
+window.scrollTo({top:this.universeScrollY,left:0,behavior:'instant'});
+});
+}
+}
 scroll(){document.querySelector('#projects')?.scrollIntoView({behavior:'smooth'})}
 move(event:MouseEvent){
 if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
@@ -147,9 +180,6 @@ letter.style.setProperty('--energy','0');
 });
 this.lastTitleTime=0;
 }
-
-
-
 
 
 /* MARVILLVERSE-GRAVITY-TS */
@@ -399,7 +429,6 @@ requestAnimationFrame(frame);
 /* /MARVILLVERSE-GRAVITY-TS */
 
 
-
 /* MARVILLVERSE-COMPRESS-HOVER */
 compressTitle(event:MouseEvent){
 if(
@@ -569,22 +598,30 @@ word.style.setProperty('--wave-energy','0');
 });
 }
 /* /MARVILLVERSE-SUBTEXT-WAVE */
+
+/* MV-V4-MESSAGE-START */
+@HostListener('window:message',['$event'])
+onUniverseIframeMessage(messageEvent:MessageEvent){
+if(messageEvent.origin!==location.origin)return;
+
+const universeIframe=this.host.nativeElement.querySelector('.universe-frame') as HTMLIFrameElement|null;
+
+if(!universeIframe)return;
+if(messageEvent.source!==universeIframe.contentWindow)return;
+if(messageEvent.data?.type!=='MV_UNIVERSE_DBLCLICK')return;
+
+this.toggleUniverse();
+
+requestAnimationFrame(()=>{
+universeIframe.contentWindow?.postMessage(
+{
+type:'MV_UNIVERSE_STATE',
+immersive:this.universeImmersive()
+},
+location.origin
+);
+});
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* MV-V4-MESSAGE-END */
+}
 
